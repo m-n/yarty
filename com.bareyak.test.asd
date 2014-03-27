@@ -7,7 +7,8 @@
   :license "BSD 2-clause"
   :depends-on (#:cl-fam
                #:alexandria
-               #:bordeaux-threads)
+               #:bordeaux-threads
+               #:lparallel)
   :components ((:file "package")
                (:file "utils")
                (:file "com.bareyak.test")
