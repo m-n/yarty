@@ -5,6 +5,10 @@
 (defvar *tests* ()
   "alist of ((package . (test-function-names*))*)")
 
+(defvar *handle-errors* t
+  "Handle errors within deftest and test/and by failing the test and
+  printing a message.")
+
 (defun run-tests (&optional package)
   "Runs all the tests defined by deftest. 
 Returns output suitable for use by cl-test-grid."
@@ -23,13 +27,16 @@ If any don't, set the current test to failing."
     (cond ((null forms) t)
           (t `(let (,f)
                 (declare (special current-test failing-tests))
-                (handler-case
+                (block handler
+                  (handler-bind 
+                      ((error (lambda (c)
+                                (when *handle-errors*
+                                  (return-from handler
+                                    (format t "~&   test-and threw ~A~&" c))))))
                     (unwind-protect (setq ,f ,(car forms))
                       (when  (not ,f)
                         (progn (format t "~&  Failing Form ~S" ',(car forms))
-                               (pushnew current-test failing-tests))))
-                  (error (c)
-                    (format t "~&   test-and threw ~A~&" c)))
+                               (pushnew current-test failing-tests))))))
                 (test-and ,@(cdr forms)))))))
 
 (defmacro def-deftest (name obody documentation)
@@ -42,10 +49,13 @@ If any don't, set the current test to failing."
           (defun ,name ()
             (let ((current-test ',name))
               (declare (special current-test failing-tests))
-              (handler-case (,',obody ,@body)
-                (error (c)
-                  (pushnew current-test failing-tests)
-                  (format t "~&   toplevel threw ~A~&" c)))))))))
+              (handler-bind ((error
+                              (lambda (c)
+                                (pushnew current-test failing-tests)
+                                (when *handle-errors*
+                                  (return-from ,name 
+                                    (format t "~&   toplevel threw ~A~&" c))))))
+                (,',obody ,@body))))))))
 
 (def-deftest deftest progn
   "Define a function that will be called during run-tests. Insert forms
