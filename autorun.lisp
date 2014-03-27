@@ -1,6 +1,6 @@
 ;;;; autorun.lisp
 
-(in-package #:com.bareyak.test)
+(in-package #:yarty)
 
 (defun monitor (filename fn &optional (monitor-fn 'fam-monitor-file))
   (bt:make-thread

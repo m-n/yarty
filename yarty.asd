@@ -1,6 +1,6 @@
-;;;; com.bareyak.test.asd
+;;;; yarty.asd
 
-(asdf:defsystem #:com.bareyak.test
+(asdf:defsystem #:yarty
   :serial t
   :description "A small testing library"
   :author "Matt Niemeir <matt.niemeir@gmail.com>"
@@ -11,6 +11,6 @@
                #:lparallel)
   :components ((:file "package")
                (:file "utils")
-               (:file "com.bareyak.test")
+               (:file "yarty")
                (:file "autorun")))
 

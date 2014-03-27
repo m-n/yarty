@@ -1,6 +1,6 @@
 ;;;; utils.lisp
 
-(in-package #:com.bareyak.test)
+(in-package #:yarty)
 
 ;;;; General
 

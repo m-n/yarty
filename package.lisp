@@ -1,6 +1,6 @@
 ;;;; package.lisp
 
-(defpackage #:com.bareyak.test
+(defpackage #:yarty
   (:use #:cl)
   (:export
    #:deftest/and

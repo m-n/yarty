@@ -3,7 +3,7 @@
    three dozen times in a row.
 
 2. Handler is aborting the rest of the clauses to a test and on error
-   instead of running them.
+   instead of running them?
 
 3. Argument values aren't shown in any way.
 

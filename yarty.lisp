@@ -1,6 +1,6 @@
-;;;; com.bareyak.test.lisp
+;;;; yarty.lisp
 
-(in-package #:com.bareyak.test)
+(in-package #:yarty)
 
 (defvar *tests* ()
   "alist of ((package . (test-function-names*))*)")
