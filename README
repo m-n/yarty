@@ -1,6 +1,44 @@
 YARTY
+=====
+
 Yet Another Recursion To YARTY
+
 or
+
 Yet Another Regression Tester is YARTY
 
-A small testing library
+A small testing library.
+
+YARTY is similar to other CL regression test libraries. The main
+design points particular to YARTY are as follows. First, the returned
+value for the test is immediately compatible with
+CL-TEST-GRID. Second, there is only one test predicate \-\- TEST-AND
+\-\- and it only tests whether values are truthy. For other
+predicates, e.g. EQUAL, the YARTY way is to include the EQUAL call
+within a TEST-AND. Third, automatic triggering of the test suite on
+filesystem changes is included via TEST-ON-CHANGE.
+
+The latter feature is still experimental.
+
+Glossary
+========
+
+For Writing Tests
+-----------------
+
+DEFTEST:            Define a function that will be called during run-tests. 
+DEFTEST/AND:        Like DEFTEST but wraps its body in a test-and.
+TEST-AND:           Test that each form returns truthy.
+SIGNALS-A:          Returns true if body signals the condition.
+
+For Running Tests
+-----------------
+
+RUN-TESTS:          Runs all the tests defined by deftest. 
+TEST-ON-CHANGE:     Start a background thread which runs tests when location is modified.
+*HANDLE-ERRORS*:    t: handle errors in tests; nil: decline to handle. Default is t.
+
+For Managing Tests
+------------------
+
+CLEAR-TESTS:        Clear the tests for the given package, default to *package*.

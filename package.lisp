@@ -10,6 +10,6 @@
    #:signals-a
    #:test-on-change
    #:clear-tests
-   #:*handle-errors*
+   #:*handle-errors* 
    ))
 

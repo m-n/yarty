@@ -3,14 +3,14 @@
 (in-package #:yarty)
 
 (defvar *tests* ()
-  "alist of ((package . (test-function-names*))*)")
+  "An alist of ((package . (test-function-names*))*)")
 
 (defvar *handle-errors* t
-  "Handle errors within deftest and test/and by failing the test and
-  printing a message.")
+  "t: handle errors in tests; nil: decline to handle. Default is t.")
 
 (defun run-tests (&optional package)
   "Runs all the tests defined by deftest. 
+
 Returns output suitable for use by cl-test-grid."
   (let (failing-tests
         (package (find-package package)))
@@ -22,6 +22,7 @@ Returns output suitable for use by cl-test-grid."
 
 (defmacro test-and (&body forms)
   "Test that each form returns truthy.
+
 If any don't, set the current test to failing."
   (let ((f (gensym)))
     (cond ((null forms) t)
@@ -58,8 +59,9 @@ If any don't, set the current test to failing."
                 (,',obody ,@body))))))))
 
 (def-deftest deftest progn
-  "Define a function that will be called during run-tests. Insert forms
-which should return truthy inside a TEST-AND.")
+  "Define a function that will be called during run-tests. 
+
+Insert forms which should return truthy inside a TEST-AND.")
 
 (def-deftest deftest/and test-and
   "Like DEFTEST but wraps its body in a test-and.")
@@ -70,4 +72,10 @@ which should return truthy inside a TEST-AND.")
      (,condition (c) (declare (ignore c)) t)))
 
 (defun clear-tests (&optional (package *package*))
-  (assocf (find-package package) () *tests*))
+  "Clear the tests for the given package, default to *package*.
+
+If nil is given as an explicit argument, clear all tests for all
+packages."
+  (if package
+      (assocf (find-package package) () *tests*)
+      (setq *tests* ())))

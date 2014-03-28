@@ -46,9 +46,10 @@
           (location-type (or :directory :file)))
   "Start a background thread which runs tests when location is modified.
 
-System should be a symbol or a package. Location defaults to the
-directory containing the asdf:system-source-file. location-type is
-either :directory or :file, defaulting to :directory."
+System should be a string or symbol designating a package
+name. Location defaults to the directory containing the
+asdf:system-source-file. location-type is either :directory or :file,
+defaulting to :directory."
   (unless cl-fam:*fam* (cl-fam:fam-init "tests"))
   (when (stringp system)
     (setq system (make-symbol (string-upcase system))))
