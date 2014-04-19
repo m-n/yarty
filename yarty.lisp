@@ -24,21 +24,45 @@ Returns output suitable for use by cl-test-grid."
   "Test that each form returns truthy.
 
 If any don't, set the current test to failing."
-  (let ((f (gensym)))
-    (cond ((null forms) t)
-          (t `(let (,f)
-                (declare (special current-test failing-tests))
-                (block handler
-                  (handler-bind 
-                      ((error (lambda (c)
-                                (when *handle-errors*
-                                  (return-from handler
-                                    (format t "~&   test-and threw ~A~&" c))))))
-                    (unwind-protect (setq ,f ,(car forms))
-                      (when  (not ,f)
-                        (progn (format t "~&  Failing Form ~S" ',(car forms))
-                               (pushnew current-test failing-tests))))))
-                (test-and ,@(cdr forms)))))))
+  (cond ((null forms) t)
+        (t
+         (let* ((f (gensym))
+                (len (if (listp (car forms))
+                         (length (car forms))
+                         ()))
+                (args (alexandria:make-gensym-list
+                       (if (and len (plusp len)) (1- len) 0))))
+           `(let (,f
+                  ,@args)
+              (declare (ignorable ,@args))
+              (declare (special current-test failing-tests))
+              (block handler
+                (handler-bind
+                    ((error (lambda (c)
+                              (when *handle-errors*
+                                (return-from handler
+                                  (format t "~&   test-and threw ~A~&" c))))))
+                  (unwind-protect
+                       ,(if (and (listp (car forms))
+                                 (symbol-function (caar forms))
+                                 (not (special-operator-p (caar forms)))
+                                 (not (macro-function (caar forms))))
+                            `(setq ,@(alexandria:mappend
+                                      #'list args (cdar forms))
+                                   ,f (funcall ',(caar forms) ,@args))
+                            `(setq ,f ,(car forms)))
+                    (when  (not ,f)
+                      (progn (format t "~&  Failing Form ~A" ',(car forms))
+                             ,(when (and args
+                                         (listp (car forms))
+                                         (symbol-function (caar forms))
+                                         (not (special-operator-p (caar forms)))
+                                         (not (macro-function (caar forms))))
+                                    `(format t "~&         NULL: (~A~{ ~A~^~})"
+                                             ',(caar forms)
+                                             (list ,@args)))
+                             (pushnew current-test failing-tests))))))
+              (test-and ,@(cdr forms)))))))
 
 (defmacro def-deftest (name obody documentation)
   (alexandria:with-gensyms (cons)
