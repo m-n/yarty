@@ -20,3 +20,11 @@
                          (setf (cdr ,cons) ,gval))
                        (acons ,gkey ,gval ,gaccess)))))
            ,set)))))
+
+(defmacro ensure-dynamic-bindings ((&rest symbols) &body body)
+  "Ensure symbols are dynamically bound without shadowing extant bindings."
+  (alexandria:with-gensyms (unbound)
+    `(let ((,unbound (remove-if #'boundp ',symbols)))
+       (progv ,unbound ',(make-list (length symbols))
+         (locally (declare (special ,@symbols))
+           ,@body)))))

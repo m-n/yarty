@@ -48,36 +48,40 @@ If any don't, set the current test to failing."
            `(let (,f
                   ,@args)
               (declare (ignorable ,@args))
-              (declare (special current-test failing-tests))
-              (block handler
-                (handler-bind
-                    ((error (lambda (c)
-                              (when *handle-errors*
-                                (return-from handler
-                                  (format t "~&   test-and in ~A threw ~A~&"
-                                          current-test
-                                          c))))))
-                  (unwind-protect
-                       ,(if (and (listp (car forms))
-                                 (symbol-function (caar forms))
-                                 (not (special-operator-p (caar forms)))
-                                 (not (macro-function (caar forms))))
-                            `(setq ,@(alexandria:mappend
-                                      #'list args (cdar forms))
-                                   ,f (funcall ',(caar forms) ,@args))
-                            `(setq ,f ,(car forms)))
-                    (when  (not ,f)
-                      (progn (format t "~&  In ~A" current-test)
-                             (format t "~&  Failing Form ~A" ',(car forms))
-                             ,(when (and args
-                                         (listp (car forms))
-                                         (symbol-function (caar forms))
-                                         (not (special-operator-p (caar forms)))
-                                         (not (macro-function (caar forms))))
-                                    `(format t "~&               (~A~{ ~A~^~})"
-                                             ',(caar forms)
-                                             (list ,@args)))
-                             (pushnew current-test failing-tests))))))
+              (ensure-dynamic-bindings (current-test failing-tests)
+                (block handler
+                  (handler-bind
+                      ((error (lambda (c)
+                                (when *handle-errors*
+                                  (return-from handler
+                                    (format t "~&   test-and in ~A threw ~A~&"
+                                            current-test
+                                            c))))))
+                    (unwind-protect
+                         ,(if (and (listp (car forms))
+                                   (caar forms)
+                                   (symbolp (caar forms))
+                                   (symbol-function (caar forms))
+                                   (not (special-operator-p (caar forms)))
+                                   (not (macro-function (caar forms))))
+                              `(setq ,@(alexandria:mappend
+                                        #'list args (cdar forms))
+                                     ,f (funcall ',(caar forms) ,@args))
+                              `(setq ,f ,(car forms)))
+                      (when  (not ,f)
+                        (progn (format t "~&  In ~A" current-test)
+                               (format t "~&  Failing Form ~A" ',(car forms))
+                               ,(when (and args
+                                           (listp (car forms))
+                                           (caar forms)
+                                           (symbolp (caar forms))
+                                           (symbol-function (caar forms))
+                                           (not (special-operator-p (caar forms)))
+                                           (not (macro-function (caar forms))))
+                                      `(format t "~&               (~A~{ ~S~^~})"
+                                               ',(caar forms)
+                                               (list ,@args)))
+                               (pushnew current-test failing-tests)))))))
               (test-and ,@(cdr forms)))))))
 
 (defmacro def-deftest (name obody documentation)
@@ -89,16 +93,20 @@ If any don't, set the current test to failing."
           (pushnew ',name (cdr ,',cons))
           (defun ,name ()
             (let ((current-test ',name))
-              (declare (special current-test failing-tests))
-              (handler-bind ((error
-                              (lambda (c)
-                                (pushnew current-test failing-tests)
-                                (when *handle-errors*
-                                  (return-from ,name 
-                                    (format t "~&   ~A's toplevel threw ~A~&"
-                                            current-test
-                                            c))))))
-                (,',obody ,@body))))))))
+              (declare (special current-test))
+              (ensure-dynamic-bindings (failing-tests)
+                (handler-bind ((error
+                                (lambda (c)
+                                  (pushnew current-test failing-tests)
+                                  (when *handle-errors*
+                                    (return-from ,name
+                                      (format t "~&   ~A's toplevel threw ~A~&"
+                                              current-test
+                                              c))))))
+                  (,',obody ,@body)
+                  (if failing-tests
+                      (cons :failed-tests failing-tests)
+                      :ok)))))))))
 
 (def-deftest deftest progn
   "Define a function that will be called during run-tests. 
