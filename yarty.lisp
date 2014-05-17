@@ -8,6 +8,10 @@
 (defvar *handle-errors* t
   "t: handle errors in tests; nil: decline to handle. Default is t.")
 
+(defvar *restart-queue* (lparallel.queue:make-queue :fixed-capacity 1))
+(defvar *in-progress-queue* (lparallel.queue:make-queue :fixed-capacity 1))
+(defvar *test-system* ())
+
 (defun run-tests (&optional package)
   "Runs all the tests defined by deftest. 
 
@@ -15,10 +19,19 @@ Returns output suitable for use by cl-test-grid."
   (let (failing-tests
         (package (find-package package)))
     (declare (special failing-tests))
-    (mapc #'funcall (reverse (cdr (assoc package *tests*))))
-    (print (if failing-tests
-               (cons :failed-tests failing-tests)
-               :ok))))
+    (flet ((finish ()
+             (print (if failing-tests
+                        (cons :failed-tests failing-tests)
+                        :ok)))
+           (restart ()
+             (return-from run-tests (test *test-system*))))
+      (dolist (test (reverse (cdr (assoc package *tests*))) (finish))
+        (let ((restartp (lparallel.queue:peek-queue *restart-queue*)))
+          (cond (restartp
+                 (lparallel.queue:try-pop-queue *restart-queue*)
+                 (restart))
+                (t
+                 (funcall test))))))))
 
 (defmacro test-and (&body forms)
   "Test that each form returns truthy.

@@ -1,11 +1,28 @@
+Open
+----
+
+5. Need a way to stop test-on-change
+
+6. Somehow we managed to deadlock sbcl when stress testing
+   test-on-change (this may have been related with running
+   test-on-change multiple times for the same system and manually
+   killing threads)
+
+Closed
+------
+
 1. When LS tests were autorunning and autorun and we used
    test-on-change in SDB, the LS test suit seemed to trigger two or
    three dozen times in a row.
+-- Went away with queue driven redesign
 
-2. Handler is aborting the rest of the clauses to a test and on error
+2. Is handler aborting the rest of the clauses to a test and on error
    instead of running them?
+-- can't reproduce
 
 3. Argument values aren't shown in any way.
+-- added printing of function arguments for failed tests
 
 4. No option to drop into the debugger. Could expose through a global
    special.
+-- added *handle-errors*

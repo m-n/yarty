@@ -1,17 +1,11 @@
 YARTY
 =====
 
-Yet Another Recursion To YARTY
-
-or
-
-Yet Another Regression Tester is YARTY
-
-A small testing library.
+Yare and Astounding Regression Tester: YARTY
 
 YARTY is similar to other CL regression test libraries. The main
 design points particular to YARTY are as follows. First, the returned
-value for the test is immediately compatible with
+value from testing is immediately compatible with
 CL-TEST-GRID. Second, there is only one test predicate \-\- TEST-AND
 \-\- and it only tests whether values are truthy. For other
 predicates, e.g. EQUAL, the YARTY way is to include the EQUAL call
