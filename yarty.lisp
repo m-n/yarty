@@ -59,11 +59,7 @@ If any don't, set the current test to failing."
                                             c))))))
                     (unwind-protect
                          ,(if (and (listp (car forms))
-                                   (caar forms)
-                                   (symbolp (caar forms))
-                                   (symbol-function (caar forms))
-                                   (not (special-operator-p (caar forms)))
-                                   (not (macro-function (caar forms))))
+                                   (function-name-p (caar forms)))
                               `(setq ,@(alexandria:mappend
                                         #'list args (cdar forms))
                                      ,f (funcall ',(caar forms) ,@args))
@@ -73,11 +69,7 @@ If any don't, set the current test to failing."
                                (format t "~&  Failing Form ~A" ',(car forms))
                                ,(when (and args
                                            (listp (car forms))
-                                           (caar forms)
-                                           (symbolp (caar forms))
-                                           (symbol-function (caar forms))
-                                           (not (special-operator-p (caar forms)))
-                                           (not (macro-function (caar forms))))
+                                           (function-name-p (caar forms)))
                                       `(format t "~&               (~A~{ ~S~^~})"
                                                ',(caar forms)
                                                (list ,@args)))

@@ -28,3 +28,10 @@
        (progv ,unbound ',(make-list (length symbols))
          (locally (declare (special ,@symbols))
            ,@body)))))
+
+(defun function-name-p (form)
+  (and form
+       (symbolp form)
+       (symbol-function form)
+       (not (special-operator-p form))
+       (not (macro-function form))))
