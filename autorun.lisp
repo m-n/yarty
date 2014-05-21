@@ -31,16 +31,13 @@
                        (*package* . ,*package*)
                        (*restart-queue* . ,restart-queue)
                        (*in-progress-queue* . ,in-progress-queue)
-                       (*control-queue* . ,control-queue)))))
+                       (*control-queue* . ,control-queue)
+                       (*test-system* . ,system)))))
               (lparallel:make-channel)))))
 
 (defun test-system (&optional (system (intern (package-name *package*) :keyword)))
-  (let ((*test-system* system))
-    (lparallel.queue:with-locked-queue *in-progress-queue*
-      (unless (lparallel.queue:peek-queue/no-lock *in-progress-queue*)
-        (lparallel.queue:push-queue/no-lock t *in-progress-queue*)))
-    (unwind-protect (asdf:test-system system)
-      (lparallel.queue:try-pop-queue *in-progress-queue*))))
+  (unwind-protect (asdf:test-system system)
+    (lparallel.queue:try-pop-queue *in-progress-queue*)))
 
 (defun make-fam-handler (location)
   (lambda ()
@@ -79,11 +76,14 @@ Blocks if the queue is empty."
          (lparallel.queue:push-queue :shutdown *control-queue*)
          (return))
         (:fam-changed
-         (if (lparallel.queue:peek-queue *in-progress-queue*)
-             (lparallel.queue:with-locked-queue *restart-queue*
-               (unless (lparallel.queue:peek-queue/no-lock *restart-queue*)
-                 (lparallel.queue:push-queue/no-lock t *restart-queue*)))
-             (lparallel:submit-task channel #'test-system system)))))))
+         (lparallel.queue:with-locked-queue *in-progress-queue*
+           (cond ((lparallel.queue:peek-queue/no-lock *in-progress-queue*)
+                  (lparallel.queue:with-locked-queue *restart-queue*
+                    (unless (lparallel.queue:peek-queue/no-lock *restart-queue*)
+                      (lparallel.queue:push-queue/no-lock t *restart-queue*))))
+                 (t
+                  (lparallel.queue:push-queue/no-lock t *in-progress-queue*)
+                  (lparallel:submit-task channel #'test-system system)))))))))
 
 (defun start-test-on-change (system location)
   (let ((chan (ensure-system-channel system)))
