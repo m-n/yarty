@@ -7,16 +7,17 @@ For SBCL and CCL on Linux.
 
 YARTY is similar to other CL regression test libraries. The main
 design points particular to YARTY are as follows. First, the returned
-value from RUN-TESTS is immediately compatible with
-CL-TEST-GRID. Second, there is only one test predicate \-\- TEST-AND
+value from `RUN-TESTS` is immediately compatible with
+CL-TEST-GRID. Second, there is only one test predicate \-\- `EACH`
 \-\- and it only tests whether values are truthy. For other
-predicates, e.g. EQUAL, the YARTY way is to include the EQUAL call
-within a TEST-AND. Third, automatic triggering of the test suite on
-filesystem changes is included via TEST-ON-CHANGE.
+predicates, e.g. `EQUAL`, the YARTY way is to include the `EQUAL` call
+within an `EACH`. Third, automatic triggering of the test suite on
+filesystem changes is included via `TEST-ON-CHANGE`.
 
-TEST-ON-CHANGE is still experimental. It requires an asdf system as an
-argument and internally calls ASDF:TEST-SYSTEM to trigger the
-tests. ASDF thus takes care of triggering any necessary recompilation.
+`TEST-ON-CHANGE` is still experimental, but it is a primary goal of
+YARTY to make it practical. It internally calls ASDF:TEST-SYSTEM to
+trigger the tests. ASDF thus takes care of triggering any necessary
+recompilation.
 
 Glossary
 ========
@@ -24,15 +25,15 @@ Glossary
 For Writing Tests
 -----------------
 
-DEFTEST:            Define a function that will be called during run-tests. 
-DEFTEST/AND:        Like DEFTEST but wraps its body in a test-and.
-TEST-AND:           Test that each form returns truthy.
+DEFTEST:            Define a function that will be called during RUN-TESTS.
+DEFTEST/EACH:        Like DEFTEST but wraps its body in an EACH.
+EACH:           Test that each form returns truthy.
 SIGNALS-A:          Returns true if body signals the condition.
 
 For Running Tests
 -----------------
 
-RUN-TESTS:          Runs all the tests defined by deftest. 
+RUN-TESTS:          Runs all the tests defined by DEFTEST in a given package.
 TEST-ON-CHANGE:     Toggle whether asdf:test-system is automatically run when source is touched.
 *HANDLE-ERRORS*:    t: handle errors in tests; nil: decline to handle. Default is t.
 

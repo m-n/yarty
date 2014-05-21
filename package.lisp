@@ -3,10 +3,10 @@
 (defpackage #:yarty
   (:use #:cl)
   (:export
-   #:deftest/and
+   #:deftest/each
    #:deftest
    #:run-tests
-   #:test-and
+   #:each
    #:signals-a
    #:test-on-change
    #:clear-tests

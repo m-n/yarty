@@ -12,8 +12,8 @@
 (defvar *in-progress-queue* (lparallel.queue:make-queue :fixed-capacity 1))
 (defvar *test-system* ())
 
-(defun run-tests (&optional package)
-  "Runs all the tests defined by deftest. 
+(defun run-tests (&optional (package *package*))
+  "Runs all the tests defined by DEFTEST in a given package.
 
 Returns output suitable for use by cl-test-grid."
   (let (failing-tests
@@ -33,7 +33,7 @@ Returns output suitable for use by cl-test-grid."
                 (t
                  (funcall test))))))))
 
-(defmacro test-and (&body forms)
+(defmacro each (&body forms)
   "Test that each form returns truthy.
 
 If any don't, set the current test to failing."
@@ -54,7 +54,7 @@ If any don't, set the current test to failing."
                       ((error (lambda (c)
                                 (when *handle-errors*
                                   (return-from handler
-                                    (format t "~&   test-and in ~A threw ~A~&"
+                                    (format t "~&   each in ~A threw ~A~&"
                                             current-test
                                             c))))))
                     (unwind-protect
@@ -74,7 +74,7 @@ If any don't, set the current test to failing."
                                                ',(caar forms)
                                                (list ,@args)))
                                (pushnew current-test failing-tests)))))))
-              (test-and ,@(cdr forms)))))))
+              (each ,@(cdr forms)))))))
 
 (defmacro def-deftest (name obody documentation)
   (alexandria:with-gensyms (cons)
@@ -101,12 +101,12 @@ If any don't, set the current test to failing."
                       :ok)))))))))
 
 (def-deftest deftest progn
-  "Define a function that will be called during run-tests. 
+  "Define a function that will be called during RUN-TESTS.
 
-Insert forms which should return truthy inside a TEST-AND.")
+Insert forms which should return truthy inside an EACH.")
 
-(def-deftest deftest/and test-and
-  "Like DEFTEST but wraps its body in a test-and.")
+(def-deftest deftest/each each
+  "Like DEFTEST but wraps its body in an EACH.")
 
 (defmacro signals-a (condition &body body)
   "Returns true if body signals the condition."
