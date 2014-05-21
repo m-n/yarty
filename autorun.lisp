@@ -113,7 +113,7 @@ Blocks if the queue is empty."
 System should be a string or symbol designating a system
 name. Location defaults to the directory containing the
 asdf:system-source-file."
-  (when (stringp system)
+  (unless (keywordp system)
     (setq system (intern (string-upcase system) :keyword)))
   (if (gethash system *system-channels*)
       (shutdown-test-on-change system)
