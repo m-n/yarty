@@ -3,16 +3,20 @@ YARTY
 
 Yare and Astounding Regression Tester: YARTY
 
+For SBCL and CCL on Linux.
+
 YARTY is similar to other CL regression test libraries. The main
 design points particular to YARTY are as follows. First, the returned
-value from testing is immediately compatible with
+value from RUN-TESTS is immediately compatible with
 CL-TEST-GRID. Second, there is only one test predicate \-\- TEST-AND
 \-\- and it only tests whether values are truthy. For other
 predicates, e.g. EQUAL, the YARTY way is to include the EQUAL call
 within a TEST-AND. Third, automatic triggering of the test suite on
 filesystem changes is included via TEST-ON-CHANGE.
 
-The latter feature is still experimental.
+TEST-ON-CHANGE is still experimental. It requires an asdf system as an
+argument and internally calls ASDF:TEST-SYSTEM to trigger the
+tests. ASDF thus takes care of triggering any necessary recompilation.
 
 Glossary
 ========
@@ -29,10 +33,27 @@ For Running Tests
 -----------------
 
 RUN-TESTS:          Runs all the tests defined by deftest. 
-TEST-ON-CHANGE:     Start a background thread which runs tests when location is modified.
+TEST-ON-CHANGE:     Toggle whether asdf:test-system is automatically run when source is touched.
 *HANDLE-ERRORS*:    t: handle errors in tests; nil: decline to handle. Default is t.
 
 For Managing Tests
 ------------------
 
 CLEAR-TESTS:        Clear the tests for the given package, default to *package*.
+
+Installation
+============
+
+YARTY depends on CL-FAM, which requires installation of the FAM or
+Gamin library. (They are libraries for watching the file system for
+changes. Install one through your system's package manager.)
+
+As of May 2014 there are some CL-FAM fixes only available from my
+fork, and YARTY is not distributed except from git. I recommend
+installing Quicklisp then checking them both out in local-projects:
+
+    cd ~/quicklisp/local-projects
+    git clone https://github.com/m-n/yarty
+    git clone https://github.com/m-n/cl-fam
+    cd cl-fam
+    git checkout -t origin/cffi-update # checkout the cl-fam branch with fixes

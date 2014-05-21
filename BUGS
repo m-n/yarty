@@ -1,13 +1,6 @@
 Open
 ----
 
-5. Need a way to stop test-on-change
-
-6. Somehow we managed to deadlock sbcl when stress testing
-   test-on-change (this may have been related with running
-   test-on-change multiple times for the same system and manually
-   killing threads)
-
 Closed
 ------
 
@@ -26,3 +19,13 @@ Closed
 4. No option to drop into the debugger. Could expose through a global
    special.
 -- added *handle-errors*
+
+5. Need a way to stop test-on-change
+-- Fixed; call TEST-ON-CHANGE again to toggle it.
+
+6. Somehow we managed to deadlock sbcl when stress testing
+   test-on-change (this may have been related with running
+   test-on-change multiple times for the same system and manually
+   killing threads)
+-- Can't reproduce. Probably eliminated when TEST-ON-CHANGE was
+   rewritten.

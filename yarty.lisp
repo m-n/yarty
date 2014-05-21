@@ -24,7 +24,7 @@ Returns output suitable for use by cl-test-grid."
                         (cons :failed-tests failing-tests)
                         :ok)))
            (restart ()
-             (return-from run-tests (test *test-system*))))
+             (return-from run-tests (test-system *test-system*))))
       (dolist (test (reverse (cdr (assoc package *tests*))) (finish))
         (let ((restartp (lparallel.queue:peek-queue *restart-queue*)))
           (cond (restartp
