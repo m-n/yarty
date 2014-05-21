@@ -30,8 +30,9 @@
            ,@body)))))
 
 (defun function-name-p (form)
+  ;; Form might not yet have an fdefinition when this is called,
+  ;; e.g. it could be defun'd in the same file.
   (and form
        (symbolp form)
-       (symbol-function form)
        (not (special-operator-p form))
        (not (macro-function form))))
