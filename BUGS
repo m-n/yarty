@@ -1,6 +1,48 @@
 Open
 ----
 
+7. Sending autorun output to the repl is unsatisfactory, and probably
+   requires setup not described in the readme.
+
+8. Starting TEST-ON-CHANGE failing with FAMOpen2 error code 3, this
+   seems to be related to either little free memory or having already
+   run fam before (possibly with an ungraceful exit/hanging)
+
+9. Compilation errors triggered by TEST-ON-CHANGE open the debugger,
+   this is probably undesirable. The undesirability is exacerbated by
+   the fact that the test running seems to be sometimes triggered at
+   random.
+
+10 When an error is thrown by evaluation of a function's argument
+   during EACH, the function's arguments are erroneously reported as
+   returning nil.
+
+11 Under TEST-ON-CHANGE tests seem to sometimes trigger at
+   random. Initial hypothesis: emacs autosave files are triggering
+   fam.
+
+12 Ran into a situation where test-on-change kept triggering
+   constantly while trying to write a large cdb file.
+
+13 During *12 calling test-on-change from entering the debugger with
+   an interrupt failed to kill the test-on-change threads. After the
+   file was finished writing we were able to kill the threads.
+
+14 TEST-ON-CHANGE is a clunky name. Maybe call it AUTORUN or AUTOTEST
+   or simply AUTO?
+
+15 It should be possible to YARTY:RUN-TESTS or (asdf:test-system 'foo)
+   /without/ loading autorun.lisp -- especially /without/ bring in the
+   cl-fam dependency. This is important so that end users of libraries
+   which use YARTY can run the test suite with hopefully minimum
+   overhead. (The C FAM/Gamin dependency is particularly egregious,
+   and so is requesting that the user manually install my fork of
+   cl-fam, but it might be nice to make BT and LPARALLEL loading
+   contingent on TEST-ON-CHANGE use as well.)
+
+16 Should TEST-ON-CHANGE only trigger when a _relevant_ file is
+   changed? Related to 12.
+
 Closed
 ------
 

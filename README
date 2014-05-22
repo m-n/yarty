@@ -5,6 +5,11 @@ Yare and Astounding Regression Tester: YARTY
 
 For SBCL and CCL on Linux.
 
+Status: There are several known issues including severe issues. See
+BUGS file. These were discovered at a rate which suggests there are
+probably still several severe unknown issues as well. I expect to fix
+these issues during summer 2014.
+
 YARTY is similar to other CL regression test libraries. The main
 design points particular to YARTY are as follows. First, the returned
 value from `RUN-TESTS` is immediately compatible with
