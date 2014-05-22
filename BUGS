@@ -13,10 +13,6 @@ Open
    the fact that the test running seems to be sometimes triggered at
    random.
 
-10 When an error is thrown by evaluation of a function's argument
-   during EACH, the function's arguments are erroneously reported as
-   returning nil.
-
 11 Under TEST-ON-CHANGE tests seem to sometimes trigger at
    random. Initial hypothesis: emacs autosave files are triggering
    fam.
@@ -71,3 +67,8 @@ Closed
    killing threads)
 -- Can't reproduce. Probably eliminated when TEST-ON-CHANGE was
    rewritten.
+
+10 When an error is thrown by evaluation of a function's argument
+   during EACH, the function's arguments are erroneously reported as
+   returning nil.
+-- Fixed

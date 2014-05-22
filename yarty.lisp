@@ -40,18 +40,21 @@ If any don't, set the current test to failing."
   (cond ((null forms) t)
         (t
          (let* ((f (gensym))
+                (errp (gensym))
                 (len (if (listp (car forms))
                          (length (car forms))
                          ()))
                 (args (alexandria:make-gensym-list
                        (if (and len (plusp len)) (1- len) 0))))
            `(let (,f
+                  ,errp
                   ,@args)
               (declare (ignorable ,@args))
               (ensure-dynamic-bindings (current-test failing-tests)
                 (block handler
                   (handler-bind
                       ((error (lambda (c)
+                                (setq ,errp t)
                                 (when *handle-errors*
                                   (return-from handler
                                     (format t "~&   each in ~A threw ~A~&"
@@ -65,15 +68,22 @@ If any don't, set the current test to failing."
                                      ,f (funcall ',(caar forms) ,@args))
                               `(setq ,f ,(car forms)))
                       (when  (not ,f)
-                        (progn (format t "~&  In ~A" current-test)
-                               (format t "~&  Failing Form ~A" ',(car forms))
+                        (pushnew current-test failing-tests)
+                        (cond ((not ,errp)
+                               (format t "~&  In ~A" current-test)
+                               (format t "~&  Failing Form ~A"
+                                       ',(car forms))
                                ,(when (and args
                                            (listp (car forms))
                                            (function-name-p (caar forms)))
-                                      `(format t "~&               (~A~{ ~S~^~})"
-                                               ',(caar forms)
-                                               (list ,@args)))
-                               (pushnew current-test failing-tests)))))))
+                                      `(format
+                                        t
+                                        "~&               (~A~{ ~S~^~})"
+                                        ',(caar forms)
+                                        (list ,@args))))
+                              (t
+                               (format t "~&  Erroring Form ~A"
+                                       ',(car forms)))))))))
               (each ,@(cdr forms)))))))
 
 (defmacro def-deftest (name obody documentation)
