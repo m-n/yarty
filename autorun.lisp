@@ -85,7 +85,7 @@ Blocks if the queue is empty."
                   (lparallel.queue:push-queue/no-lock t *in-progress-queue*)
                   (lparallel:submit-task channel #'test-system system)))))))))
 
-(defun start-test-on-change (system location)
+(defun start-autorun (system location)
   (let ((chan (ensure-system-channel system)))
     (lparallel.kernel:submit-task
      chan
@@ -94,7 +94,7 @@ Blocks if the queue is empty."
      chan
      (make-test-runner system chan))))
 
-(defun shutdown-test-on-change (system)
+(defun shutdown-autorun (system)
   (let ((chan (ensure-system-channel system)))
     (lparallel.kernel:submit-task
      chan
@@ -103,7 +103,7 @@ Blocks if the queue is empty."
        (lparallel:end-kernel)
        (remhash system *system-channels*)))))
 
-(defun test-on-change
+(defun autorun
     (&key (system (intern (package-name *package*) :keyword))
           (location (directory-namestring
                      (asdf/system:system-source-file
@@ -116,5 +116,5 @@ asdf:system-source-file."
   (unless (keywordp system)
     (setq system (intern (string-upcase system) :keyword)))
   (if (gethash system *system-channels*)
-      (shutdown-test-on-change system)
-      (start-test-on-change system location)))
+      (shutdown-autorun system)
+      (start-autorun system location)))

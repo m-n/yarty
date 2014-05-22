@@ -8,7 +8,7 @@
    #:run-tests
    #:each
    #:signals-a
-   #:test-on-change
+   #:autorun
    #:clear-tests
    #:*handle-errors* 
    ))

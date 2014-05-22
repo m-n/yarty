@@ -4,28 +4,25 @@ Open
 7. Sending autorun output to the repl is unsatisfactory, and probably
    requires setup not described in the readme.
 
-8. Starting TEST-ON-CHANGE failing with FAMOpen2 error code 3, this
+8. Starting AUTORUN failing with FAMOpen2 error code 3, this
    seems to be related to either little free memory or having already
    run fam before (possibly with an ungraceful exit/hanging)
 
-9. Compilation errors triggered by TEST-ON-CHANGE open the debugger,
+9. Compilation errors triggered by AUTORUN open the debugger,
    this is probably undesirable. The undesirability is exacerbated by
    the fact that the test running seems to be sometimes triggered at
    random.
 
-11 Under TEST-ON-CHANGE tests seem to sometimes trigger at
+11 Under AUTORUN tests seem to sometimes trigger at
    random. Initial hypothesis: emacs autosave files are triggering
    fam.
 
-12 Ran into a situation where test-on-change kept triggering
+12 Ran into a situation where autorun kept triggering
    constantly while trying to write a large cdb file.
 
-13 During *12 calling test-on-change from entering the debugger with
-   an interrupt failed to kill the test-on-change threads. After the
+13 During *12 calling autorun from entering the debugger with
+   an interrupt failed to kill the autorun threads. After the
    file was finished writing we were able to kill the threads.
-
-14 TEST-ON-CHANGE is a clunky name. Maybe call it AUTORUN or AUTOTEST
-   or simply AUTO?
 
 15 It should be possible to YARTY:RUN-TESTS or (asdf:test-system 'foo)
    /without/ loading autorun.lisp -- especially /without/ bring in the
@@ -34,16 +31,16 @@ Open
    overhead. (The C FAM/Gamin dependency is particularly egregious,
    and so is requesting that the user manually install my fork of
    cl-fam, but it might be nice to make BT and LPARALLEL loading
-   contingent on TEST-ON-CHANGE use as well.)
+   contingent on AUTORUN use as well.)
 
-16 Should TEST-ON-CHANGE only trigger when a _relevant_ file is
+16 Should AUTORUN only trigger when a _relevant_ file is
    changed? Related to 12.
 
 Closed
 ------
 
 1. When LS tests were autorunning and autorun and we used
-   test-on-change in SDB, the LS test suit seemed to trigger two or
+   autorun in SDB, the LS test suit seemed to trigger two or
    three dozen times in a row.
 -- Went away with queue driven redesign
 
@@ -58,17 +55,21 @@ Closed
    special.
 -- added *handle-errors*
 
-5. Need a way to stop test-on-change
--- Fixed; call TEST-ON-CHANGE again to toggle it.
+5. Need a way to stop autorun
+-- Fixed; call AUTORUN again to toggle it.
 
 6. Somehow we managed to deadlock sbcl when stress testing
-   test-on-change (this may have been related with running
-   test-on-change multiple times for the same system and manually
+   autorun (this may have been related with running
+   autorun multiple times for the same system and manually
    killing threads)
--- Can't reproduce. Probably eliminated when TEST-ON-CHANGE was
+-- Can't reproduce. Probably eliminated when AUTORUN was
    rewritten.
 
 10 When an error is thrown by evaluation of a function's argument
    during EACH, the function's arguments are erroneously reported as
    returning nil.
 -- Fixed
+
+14 TEST-ON-CHANGE is a clunky name. Maybe call it AUTORUN or AUTOTEST
+   or simply AUTO?
+-- AUTORUN, as a parallel to RUN-TESTS.

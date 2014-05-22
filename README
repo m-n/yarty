@@ -17,12 +17,11 @@ CL-TEST-GRID. Second, there is only one test predicate \-\- `EACH`
 \-\- and it only tests whether values are truthy. For other
 predicates, e.g. `EQUAL`, the YARTY way is to include the `EQUAL` call
 within an `EACH`. Third, automatic triggering of the test suite on
-filesystem changes is included via `TEST-ON-CHANGE`.
+filesystem changes is included via `AUTORUN`.
 
-`TEST-ON-CHANGE` is still experimental, but it is a primary goal of
-YARTY to make it practical. It internally calls ASDF:TEST-SYSTEM to
-trigger the tests. ASDF thus takes care of triggering any necessary
-recompilation.
+`AUTORUN` is still experimental, but it is a primary goal of YARTY to
+make it practical. It internally calls ASDF:TEST-SYSTEM to trigger the
+tests. ASDF thus takes care of triggering any necessary recompilation.
 
 Glossary
 ========
@@ -39,7 +38,7 @@ For Running Tests
 -----------------
 
 RUN-TESTS:          Runs all the tests defined by DEFTEST in a given package.
-TEST-ON-CHANGE:     Toggle whether asdf:test-system is automatically run when source is touched.
+AUTORUN:            Toggle whether asdf:test-system is automatically run when source is touched.
 *HANDLE-ERRORS*:    t: handle errors in tests; nil: decline to handle. Default is t.
 
 For Managing Tests
