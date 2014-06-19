@@ -40,6 +40,7 @@ For Running Tests
 RUN-TESTS:          Runs all the tests defined by DEFTEST in a given package.
 AUTORUN:            Toggle whether asdf:test-system is automatically run when source is touched.
 *HANDLE-ERRORS*:    t: handle errors in tests; nil: decline to handle. Default is t.
+*HANDLE-AUTORUN-COMPILATION-ERRORS*:    During AUTORUN: t: handle compilation errors; nil: don't. Default is t.
 
 For Managing Tests
 ------------------

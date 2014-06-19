@@ -35,9 +35,16 @@
                        (*test-system* . ,system)))))
               (lparallel:make-channel)))))
 
+(defvar *handle-autorun-compilation-errors* t
+  "During AUTORUN: t: handle compilation errors; nil: don't. Default is t.")
+
 (defun test-system (&optional (system (intern (package-name *package*) :keyword)))
-  (unwind-protect (asdf:test-system system)
-    (lparallel.queue:try-pop-queue *in-progress-queue*)))
+  (handler-bind ((error (lambda (c)
+                          (when *handle-autorun-compilation-errors*
+                            (format t "Compilation aborted due to error `~A`" c)
+                            (return-from test-system :failed-tests)))))
+    (unwind-protect (asdf:test-system system)
+      (lparallel.queue:try-pop-queue *in-progress-queue*))))
 
 (defun make-fam-handler (location)
   (lambda ()

@@ -8,11 +8,6 @@ Open
    seems to be related to either little free memory or having already
    run fam before (possibly with an ungraceful exit/hanging)
 
-9. Compilation errors triggered by AUTORUN open the debugger,
-   this is probably undesirable. The undesirability is exacerbated by
-   the fact that the test running seems to be sometimes triggered at
-   random.
-
 11 Under AUTORUN tests seem to sometimes trigger at
    random. Initial hypothesis: emacs autosave files are triggering
    fam.
@@ -64,6 +59,13 @@ Closed
    killing threads)
 -- Can't reproduce. Probably eliminated when AUTORUN was
    rewritten.
+
+9. Compilation errors triggered by AUTORUN open the debugger,
+   this is probably undesirable. The undesirability is exacerbated by
+   the fact that the test running seems to be sometimes triggered at
+   random.
+-- Fixed by adding a handler-bind in yarty:test-system and adding
+   *handle-autorun-compilation-errors*
 
 10 When an error is thrown by evaluation of a function's argument
    during EACH, the function's arguments are erroneously reported as
