@@ -28,8 +28,8 @@ Open
    cl-fam, but it might be nice to make BT and LPARALLEL loading
    contingent on AUTORUN use as well.)
 
-16 Should AUTORUN only trigger when a _relevant_ file is
-   changed? Related to 12.
+16 AUTORUN should only trigger when a _relevant_ file is
+   changed. Related to 11 and 12.
 
 Closed
 ------

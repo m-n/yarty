@@ -29,23 +29,23 @@ Glossary
 For Writing Tests
 -----------------
 
-DEFTEST:            Define a function that will be called during RUN-TESTS.
-DEFTEST/EACH:       Like DEFTEST but wraps its body in an EACH.
-EACH:               Test that each form returns truthy.
-SIGNALS-A:          Returns true if body signals the condition.
+    DEFTEST:            Define a function that will be called during RUN-TESTS.
+    DEFTEST/EACH:       Like DEFTEST but wraps its body in an EACH.
+    EACH:               Test that each form returns truthy.
+    SIGNALS-A:          Returns true if body signals the condition.
 
 For Running Tests
 -----------------
 
-RUN-TESTS:          Runs all the tests defined by DEFTEST in a given package.
-AUTORUN:            Toggle whether asdf:test-system is automatically run when source is touched.
-*HANDLE-ERRORS*:    t: handle errors in tests; nil: decline to handle. Default is t.
-*HANDLE-AUTORUN-COMPILATION-ERRORS*:    During AUTORUN: t: handle compilation errors; nil: don't. Default is t.
+    RUN-TESTS:          Runs all the tests defined by DEFTEST in a given package.
+    *HANDLE-ERRORS*:    t: handle errors in tests; nil: decline to handle. Default is t.
+    AUTORUN:            Toggle whether asdf:test-system is automatically run when source is touched.
+    *HANDLE-AUTORUN-COMPILATION-ERRORS*:    During AUTORUN: t: handle compilation errors; nil: don't. Default is t.
 
 For Managing Tests
 ------------------
 
-CLEAR-TESTS:        Clear the tests for the given package, default to *package*.
+    CLEAR-TESTS:        Clear the tests for the given package, default to *package*.
 
 Installation
 ============
