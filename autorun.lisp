@@ -6,6 +6,9 @@
 
 (defvar *system-channels* (make-hash-table))
 
+(defvar *system-kernels* (make-hash-table)
+  "A stash of kernels for debugging purposes.")
+
 (defun ensure-system-channel (system)
   (if (typep (gethash system *system-channels*)
              'lparallel.kernel:channel)
@@ -33,6 +36,7 @@
                        (*in-progress-queue* . ,in-progress-queue)
                        (*control-queue* . ,control-queue)
                        (*test-system* . ,system)))))
+              (setf (gethash system *system-kernels*) lparallel:*kernel*)
               (lparallel:make-channel)))))
 
 (defvar *handle-autorun-compilation-errors* t
