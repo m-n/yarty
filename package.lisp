@@ -11,5 +11,6 @@
    #:autorun
    #:clear-tests
    #:*handle-errors* 
+   #:*handle-autorun-compilation-errors*
    ))
 
