@@ -6,9 +6,6 @@
 
 (defvar *system-channels* (make-hash-table))
 
-(defvar *system-kernels* (make-hash-table)
-  "A stash of kernels for debugging purposes.")
-
 (defun ensure-system-channel (system)
   (if (typep (gethash system *system-channels*)
              'lparallel.kernel:channel)
@@ -30,13 +27,11 @@
                        (*compile-print* . nil)
                        (*load-verbose* . nil)
                        (*load-print* . nil)
-                       (cl-fam:*fam* . (cl-fam:fam-open "yarty" ()))
                        (*package* . ,*package*)
                        (*restart-queue* . ,restart-queue)
                        (*in-progress-queue* . ,in-progress-queue)
                        (*control-queue* . ,control-queue)
                        (*test-system* . ,system)))))
-              (setf (gethash system *system-kernels*) lparallel:*kernel*)
               (lparallel:make-channel)))))
 
 (defvar *handle-autorun-compilation-errors* t
@@ -50,19 +45,30 @@
     (unwind-protect (asdf:test-system system)
       (lparallel.queue:try-pop-queue *in-progress-queue*))))
 
-(defun make-fam-handler (location)
-  (lambda ()
-    (cl-fam:fam-monitor-directory location)
-    (loop
-      (let ((event (cl-fam:fam-next-event t))
-            (elt (lparallel.queue:peek-queue *control-queue*)))
-        (case elt
-          (:shutdown
-           (lparallel.queue:push-queue :shutdown *control-queue*)
-           (cl-fam:fam-close)
-           (return))
-          (t
-           (lparallel.queue:push-queue event *control-queue*)))))))
+(defun files-to-watch (system)
+  ;; bug: doesn't list the files in the test-system.
+  (mapcar #'asdf:component-pathname
+          (remove-if-not (alexandria:of-type 'asdf:cl-source-file)
+                         (asdf:required-components system))))
+
+(defun system-date-sum (system)
+  (reduce #'+ (mapcar #'file-write-date (files-to-watch system))))
+
+(defun make-system-watcher (system)
+  (let* ((date-sum (system-date-sum system)))
+    (lambda ()
+      (loop
+        (let ((new-date-sum (system-date-sum system)))
+          (when (not (= new-date-sum date-sum))
+            (lparallel.queue:push-queue :file-changed *control-queue*)
+            (setq date-sum new-date-sum)))
+        (sleep 0.5)
+        (multiple-value-bind (elt foundp)
+            (lparallel.queue:peek-queue *control-queue*)
+          (when foundp
+            (ecase elt
+              (:shutdown (return))
+              (:file-changed ()))))))))
 
 (defun queue-priority-event (queue priority)
   "Empty the queue and return the highest priority item.
@@ -75,18 +81,18 @@ Blocks if the queue is empty."
     (when (> (funcall priority item) (funcall priority task))
       (setq task item))))
 
-(defun test-priority (item)
-  (let ((priorities '(:shutdown 1 :fam-changed 0)))
+(defun control-priority (item)
+  (let ((priorities '(:shutdown 1 :file-changed 0)))
     (getf priorities item -1)))
 
 (defun make-test-runner (system channel)
   (lambda ()
     (loop
-      (case (queue-priority-event *control-queue* #'test-priority)
+      (ecase (queue-priority-event *control-queue* #'control-priority)
         (:shutdown
          (lparallel.queue:push-queue :shutdown *control-queue*)
          (return))
-        (:fam-changed
+        (:file-changed
          (lparallel.queue:with-locked-queue *in-progress-queue*
            (cond ((lparallel.queue:peek-queue/no-lock *in-progress-queue*)
                   (lparallel.queue:with-locked-queue *restart-queue*
@@ -96,11 +102,11 @@ Blocks if the queue is empty."
                   (lparallel.queue:push-queue/no-lock t *in-progress-queue*)
                   (lparallel:submit-task channel #'test-system system)))))))))
 
-(defun start-autorun (system location)
+(defun start-autorun (system)
   (let ((chan (ensure-system-channel system)))
     (lparallel.kernel:submit-task
      chan
-     (make-fam-handler location))
+     (make-system-watcher system))
     (lparallel.kernel:submit-task
      chan
      (make-test-runner system chan))))
@@ -115,17 +121,13 @@ Blocks if the queue is empty."
        (remhash system *system-channels*)))))
 
 (defun autorun
-    (&key (system (intern (package-name *package*) :keyword))
-          (location (directory-namestring
-                     (asdf/system:system-source-file
-                      system))))
+    (&key (system (intern (package-name *package*) :keyword)))
   "Toggle whether asdf:test-system is automatically run when source is touched.
 
 System should be a string or symbol designating a system
-name. Location defaults to the directory containing the
-asdf:system-source-file."
+name."
   (unless (keywordp system)
     (setq system (intern (string-upcase system) :keyword)))
   (if (gethash system *system-channels*)
       (shutdown-autorun system)
-      (start-autorun system location)))
+      (start-autorun system)))

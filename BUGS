@@ -4,32 +4,11 @@ Open
 7. Sending autorun output to the repl is unsatisfactory, and probably
    requires setup not described in the readme.
 
-8. Starting AUTORUN failing with FAMOpen2 error code 3, this
-   seems to be related to either little free memory or having already
-   run fam before (possibly with an ungraceful exit/hanging)
-
-11 Under AUTORUN tests seem to sometimes trigger at
-   random. Initial hypothesis: emacs autosave files are triggering
-   fam.
-
-12 Ran into a situation where autorun kept triggering
-   constantly while trying to write a large cdb file.
-
 13 During *12 calling autorun from entering the debugger with
    an interrupt failed to kill the autorun threads. After the
    file was finished writing we were able to kill the threads.
 
-15 It should be possible to YARTY:RUN-TESTS or (asdf:test-system 'foo)
-   /without/ loading autorun.lisp -- especially /without/ bring in the
-   cl-fam dependency. This is important so that end users of libraries
-   which use YARTY can run the test suite with hopefully minimum
-   overhead. (The C FAM/Gamin dependency is particularly egregious,
-   and so is requesting that the user manually install my fork of
-   cl-fam, but it might be nice to make BT and LPARALLEL loading
-   contingent on AUTORUN use as well.)
-
-16 AUTORUN should only trigger when a _relevant_ file is
-   changed. Related to 11 and 12.
+17 Files for a test system aren't watched to trigger AUTORUN.
 
 Closed
 ------
@@ -75,3 +54,31 @@ Closed
 14 TEST-ON-CHANGE is a clunky name. Maybe call it AUTORUN or AUTOTEST
    or simply AUTO?
 -- AUTORUN, as a parallel to RUN-TESTS.
+
+8. Starting AUTORUN failing with FAMOpen2 error code 3, this
+   seems to be related to either little free memory or having already
+   run fam before (possibly with an ungraceful exit/hanging)
+-- removed cl-fam dependency
+
+11 Under AUTORUN tests seem to sometimes trigger at
+   random. Initial hypothesis: emacs autosave files are triggering
+   fam.
+-- Using asdf to choose relevant files to watch.
+
+12 Ran into a situation where autorun kept triggering
+   constantly while trying to write a large cdb file.
+-- Using asdf to choose relevant files to watch.
+
+15 It should be possible to YARTY:RUN-TESTS or (asdf:test-system 'foo)
+   /without/ loading autorun.lisp -- especially /without/ bring in the
+   cl-fam dependency. This is important so that end users of libraries
+   which use YARTY can run the test suite with hopefully minimum
+   overhead. (The C FAM/Gamin dependency is particularly egregious,
+   and so is requesting that the user manually install my fork of
+   cl-fam, but it might be nice to make BT and LPARALLEL loading
+   contingent on AUTORUN use as well.)
+-- removed cl-fam dependency
+
+16 AUTORUN should only trigger when a _relevant_ file is
+   changed. Related to 11 and 12.
+-- Using asdf to choose relevant files to watch.

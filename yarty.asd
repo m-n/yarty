@@ -2,11 +2,10 @@
 
 (asdf:defsystem #:yarty
   :serial t
-  :description "A small testing library"
+  :description "Yare and Astounding Regression Tester: YARTY"
   :author "Matt Niemeir <matt.niemeir@gmail.com>"
   :license "BSD 2-clause"
-  :depends-on (#:cl-fam
-               #:alexandria
+  :depends-on (#:alexandria
                #:bordeaux-threads
                #:lparallel)
   :components ((:file "package")

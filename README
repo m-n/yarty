@@ -3,12 +3,10 @@ YARTY
 
 Yare and Astounding Regression Tester: YARTY
 
-For SBCL and CCL on Linux.
+For SBCL and CCL.
 
-Status: There are several known issues including severe issues. See
-BUGS file. These were discovered at a rate which suggests there are
-probably still several severe unknown issues as well. I expect to fix
-these issues during summer 2014.
+Status: The library has only been used lightly, but seems to preform
+reasonably.
 
 YARTY is similar to other CL regression test libraries. The main
 design points particular to YARTY are as follows. First, the returned
@@ -20,8 +18,9 @@ within an `EACH`. Third, automatic triggering of the test suite on
 filesystem changes is included via `AUTORUN`.
 
 `AUTORUN` is still experimental, but it is a primary goal of YARTY to
-make it practical. It internally calls ASDF:TEST-SYSTEM to trigger the
-tests. ASDF thus takes care of triggering any necessary recompilation.
+make it practical. When active, it internally calls ASDF:TEST-SYSTEM
+when any of that system's source files are touched. ASDF thus takes
+care of triggering any necessary recompilation.
 
 Glossary
 ========
@@ -50,16 +49,15 @@ For Managing Tests
 Installation
 ============
 
-YARTY depends on CL-FAM, which requires installation of the FAM or
-Gamin library. (They are libraries for watching the file system for
-changes. Install one through your system's package manager.)
-
-As of May 2014 there are some CL-FAM fixes only available from my
-fork, and YARTY is not distributed except from git. I recommend
-installing Quicklisp then checking them both out in local-projects:
+At the shell prompt:
 
     cd ~/quicklisp/local-projects
     git clone https://github.com/m-n/yarty
-    git clone https://github.com/m-n/cl-fam
-    cd cl-fam
-    git checkout -t origin/cffi-update # checkout the cl-fam branch with fixes
+
+Then, in lisp:
+
+    (ql:quickload 'yarty)
+
+Any bug reports, success stories, failure stories, patches, or other
+feedback are welcome at `https://github.com/m-n/yarty` and
+`matt.niemeir@gmail.com`
