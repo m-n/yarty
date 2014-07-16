@@ -10,6 +10,9 @@ Open
 
 17 Files for a test system aren't watched to trigger AUTORUN.
 
+18 Computing files-to-watch every .5 seconds is taking significant
+   compute power (~8% processor of a small digital ocean server).
+
 Closed
 ------
 
