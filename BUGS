@@ -10,6 +10,11 @@ Open
 
 17 Files for a test system aren't watched to trigger AUTORUN.
 
+19 Error handling should instead be serious condition handling.
+
+20 *handle-autorun-compilation-errors* also causes test errors to be
+   handled.
+
 Closed
 ------
 
