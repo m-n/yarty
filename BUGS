@@ -12,9 +12,6 @@ Open
 
 19 Error handling should instead be serious condition handling.
 
-20 *handle-autorun-compilation-errors* also causes test errors to be
-   handled.
-
 Closed
 ------
 
@@ -91,3 +88,9 @@ Closed
 18 Computing files-to-watch every .5 seconds is taking significant
    compute power (~8% processor of a small digital ocean server).
 -- Only recompute them when a change is detected; also watch the .asd.
+
+
+20 *handle-autorun-compilation-errors* also causes test errors to be
+   handled.
+-- *handle-autorun-compilation-errors* is no longer an option, specify
+   that autorun also binds *handle-errors* to true.

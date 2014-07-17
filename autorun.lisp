@@ -31,19 +31,16 @@
                        (*restart-queue* . ,restart-queue)
                        (*in-progress-queue* . ,in-progress-queue)
                        (*control-queue* . ,control-queue)
+                       (*handle-errors* . t)
                        (*test-system* . ,system)))))
               (lparallel:make-channel)))))
 
-(defvar *handle-autorun-compilation-errors* t
-  "During AUTORUN: t: handle compilation errors; nil: don't. Default is t.")
-
 (defun test-system (&optional (system (intern (package-name *package*) :keyword)))
-  (handler-bind ((error (lambda (c)
-                          (when *handle-autorun-compilation-errors*
-                            (format t "Compilation aborted due to error `~A`" c)
-                            (return-from test-system :failed-tests)))))
-    (unwind-protect (asdf:test-system system)
-      (lparallel.queue:try-pop-queue *in-progress-queue*))))
+  (unwind-protect (handler-case (asdf:test-system system)
+                    (serious-condition (c)
+                      (format t "Compilation aborted due to error `~A`" c)
+                      (return-from test-system :failed-tests)))
+    (lparallel.queue:try-pop-queue *in-progress-queue*)))
 
 (defun files-to-watch (system)
   ;; bug: doesn't list the files in the test-system.
@@ -127,8 +124,8 @@ Blocks if the queue is empty."
     (&key (system (intern (package-name *package*) :keyword)))
   "Toggle whether asdf:test-system is automatically run when source is touched.
 
-System should be a string or symbol designating a system
-name."
+System should be a string or symbol designating a system name. Autorun
+also binds *handle-errors* to t."
   (unless (keywordp system)
     (setq system (intern (string-upcase system) :keyword)))
   (if (gethash system *system-channels*)
