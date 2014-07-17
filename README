@@ -29,8 +29,8 @@ For Writing Tests
 -----------------
 
     DEFTEST:            Define a function that will be called during RUN-TESTS.
-    DEFTEST/EACH:       Like DEFTEST but wraps its body in an EACH.
     EACH:               Test that each form returns truthy.
+    DEFTEST/EACH:       Like DEFTEST but wraps its body in an EACH.
     SIGNALS-A:          Returns true if body signals the condition.
 
 For Running Tests
@@ -59,4 +59,4 @@ Then, in lisp:
 
 Any bug reports, success stories, failure stories, patches, or other
 feedback are welcome at `https://github.com/m-n/yarty` and
-`matt.niemeir@gmail.com`
+`matt.niemeir@gmail.com`.
