@@ -47,21 +47,24 @@
 
 (defun files-to-watch (system)
   ;; bug: doesn't list the files in the test-system.
-  (mapcar #'asdf:component-pathname
-          (remove-if-not (alexandria:of-type 'asdf:cl-source-file)
-                         (asdf:required-components system))))
+  (cons (asdf:system-source-file system)
+        (mapcar #'asdf:component-pathname
+                (remove-if-not (alexandria:of-type 'asdf:cl-source-file)
+                               (asdf:required-components system)))))
 
-(defun system-date-sum (system)
-  (reduce #'+ (mapcar #'file-write-date (files-to-watch system))))
+(defun files-date-sum (files)
+  (reduce #'+ (mapcar #'file-write-date files)))
 
 (defun make-system-watcher (system)
-  (let* ((date-sum (system-date-sum system)))
+  (let* ((files (files-to-watch system))
+         (date-sum (files-date-sum files)))
     (lambda ()
       (loop
-        (let ((new-date-sum (system-date-sum system)))
+        (let ((new-date-sum (files-date-sum files)))
           (when (not (= new-date-sum date-sum))
             (lparallel.queue:push-queue :file-changed *control-queue*)
-            (setq date-sum new-date-sum)))
+            (setq date-sum new-date-sum
+                  files (files-to-watch system))))
         (sleep 0.5)
         (multiple-value-bind (elt foundp)
             (lparallel.queue:peek-queue *control-queue*)

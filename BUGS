@@ -10,9 +10,6 @@ Open
 
 17 Files for a test system aren't watched to trigger AUTORUN.
 
-18 Computing files-to-watch every .5 seconds is taking significant
-   compute power (~8% processor of a small digital ocean server).
-
 Closed
 ------
 
@@ -85,3 +82,7 @@ Closed
 16 AUTORUN should only trigger when a _relevant_ file is
    changed. Related to 11 and 12.
 -- Using asdf to choose relevant files to watch.
+
+18 Computing files-to-watch every .5 seconds is taking significant
+   compute power (~8% processor of a small digital ocean server).
+-- Only recompute them when a change is detected; also watch the .asd.
