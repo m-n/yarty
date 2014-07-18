@@ -1,9 +1,6 @@
 Open
 ----
 
-7. Sending autorun output to the repl is unsatisfactory, and probably
-   requires setup not described in the readme.
-
 17 Files for a test system aren't watched to trigger AUTORUN.
 
 Closed
@@ -102,3 +99,8 @@ Closed
    file was finished writing we were able to kill the threads.
 -- Can't reproduce. Hopefully fixed by the refactoring that has
    happend since it was reported.
+
+7. Sending autorun output to the repl is unsatisfactory, and probably
+   requires setup not described in the readme.
+-- For now, we consider the output as good enough and mention in the
+   README that slime may need to be configured to redirect output.

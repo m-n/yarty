@@ -57,6 +57,9 @@ Then, in lisp:
 
     (ql:quickload 'yarty)
 
+In order to see the output of `AUTORUN` at the slime repl, you may
+additionally need to configure slime to globally redirect output.
+
 Any bug reports, success stories, failure stories, patches, or other
 feedback are welcome at `https://github.com/m-n/yarty` and
 `matt.niemeir@gmail.com`.
