@@ -85,9 +85,16 @@ Blocks if the queue is empty."
   (let ((priorities '(:shutdown 1 :file-changed 0)))
     (getf priorities item -1)))
 
+(defun flush-channel (channel)
+  (loop (multiple-value-bind (res foundp)
+            (lparallel:try-receive-result channel)
+          (declare (ignore res))
+          (unless foundp (return ())))))
+
 (defun make-test-runner (system channel)
   (lambda ()
     (loop
+      (flush-channel channel)
       (ecase (queue-priority-event *control-queue* #'control-priority)
         (:shutdown
          (lparallel.queue:push-queue :shutdown *control-queue*)
