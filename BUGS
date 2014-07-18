@@ -12,6 +12,9 @@ Open
 
 19 Error handling should instead be serious condition handling.
 
+21 In autorun, results of test-system are being added to a channel but
+   never recieved; growing the channel indefinitely
+
 Closed
 ------
 
