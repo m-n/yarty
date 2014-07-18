@@ -4,10 +4,6 @@ Open
 7. Sending autorun output to the repl is unsatisfactory, and probably
    requires setup not described in the readme.
 
-13 During *12 calling autorun from entering the debugger with
-   an interrupt failed to kill the autorun threads. After the
-   file was finished writing we were able to kill the threads.
-
 17 Files for a test system aren't watched to trigger AUTORUN.
 
 Closed
@@ -100,3 +96,9 @@ Closed
 21 In autorun, results of test-system are being added to a channel but
    never recieved; growing the channel indefinitely
 -- Flush the channel
+
+13 During *12 calling autorun from entering the debugger with
+   an interrupt failed to kill the autorun threads. After the
+   file was finished writing we were able to kill the threads.
+-- Can't reproduce. Hopefully fixed by the refactoring that has
+   happend since it was reported.
