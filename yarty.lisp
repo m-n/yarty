@@ -5,8 +5,8 @@
 (defvar *tests* ()
   "An alist of ((package . (test-function-names*))*)")
 
-(defvar *handle-errors* t
-  "t: handle errors in tests; nil: decline to handle. Default is t.")
+(defvar *handle-serious-conditions* t
+  "t: handle in tests; nil: decline to handle. Default is t.")
 
 (defvar *restart-queue* (lparallel.queue:make-queue :fixed-capacity 1))
 (defvar *in-progress-queue* (lparallel.queue:make-queue :fixed-capacity 1))
@@ -53,13 +53,14 @@ If any don't, set the current test to failing."
               (ensure-dynamic-bindings (current-test failing-tests)
                 (block handler
                   (handler-bind
-                      ((error (lambda (c)
-                                (setq ,errp t)
-                                (when *handle-errors*
-                                  (return-from handler
-                                    (format t "~&   each in ~A threw ~A~&"
-                                            current-test
-                                            c))))))
+                      ((serious-condition
+                        (lambda (c)
+                          (setq ,errp t)
+                          (when *handle-serious-conditions*
+                            (return-from handler
+                              (format t "~&   each in ~A threw ~A~&"
+                                      current-test
+                                      c))))))
                     (unwind-protect
                          ,(if (and (listp (car forms))
                                    (function-name-p (caar forms)))
@@ -97,10 +98,10 @@ If any don't, set the current test to failing."
             (let ((current-test ',name))
               (declare (special current-test))
               (ensure-dynamic-bindings (failing-tests)
-                (handler-bind ((error
+                (handler-bind ((serious-condition
                                 (lambda (c)
                                   (pushnew current-test failing-tests)
-                                  (when *handle-errors*
+                                  (when *handle-serious-conditions*
                                     (return-from ,name
                                       (format t "~&   ~A's toplevel threw ~A~&"
                                               current-test

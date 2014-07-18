@@ -31,7 +31,7 @@
                        (*restart-queue* . ,restart-queue)
                        (*in-progress-queue* . ,in-progress-queue)
                        (*control-queue* . ,control-queue)
-                       (*handle-errors* . t)
+                       (*handle-serious-conditions* . t)
                        (*test-system* . ,system)))))
               (lparallel:make-channel)))))
 
@@ -125,7 +125,7 @@ Blocks if the queue is empty."
   "Toggle whether asdf:test-system is automatically run when source is touched.
 
 System should be a string or symbol designating a system name. Autorun
-also binds *handle-errors* to t."
+also binds *handle-serious-conditions* to t."
   (unless (keywordp system)
     (setq system (intern (string-upcase system) :keyword)))
   (if (gethash system *system-channels*)

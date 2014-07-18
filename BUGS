@@ -10,8 +10,6 @@ Open
 
 17 Files for a test system aren't watched to trigger AUTORUN.
 
-19 Error handling should instead be serious condition handling.
-
 21 In autorun, results of test-system are being added to a channel but
    never recieved; growing the channel indefinitely
 
@@ -97,3 +95,6 @@ Closed
    handled.
 -- *handle-autorun-compilation-errors* is no longer an option, specify
    that autorun also binds *handle-errors* to true.
+
+19 Error handling should instead be serious condition handling.
+-- change from *handle-errors* to *handle-serious-conditions*

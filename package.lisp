@@ -10,5 +10,5 @@
    #:signals-a
    #:autorun
    #:clear-tests
-   #:*handle-errors* 
+   #:*handle-serious-conditions*
    ))
