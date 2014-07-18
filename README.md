@@ -18,7 +18,7 @@ within an `EACH`. Third, automatic triggering of the test suite on
 filesystem changes is included via `AUTORUN`.
 
 `AUTORUN` is still experimental, but it is a primary goal of YARTY to
-make it practical. When active, it internally calls ASDF:TEST-SYSTEM
+make it practical. When active, it internally calls `ASDF:TEST-SYSTEM`
 when any of that system's source files are touched. ASDF thus takes
 care of triggering any necessary recompilation.
 
