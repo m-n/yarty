@@ -104,3 +104,6 @@ Closed
    requires setup not described in the readme.
 -- For now, we consider the output as good enough and mention in the
    README that slime may need to be configured to redirect output.
+
+22 Tests should be restartable when conditions aren't handled.
+-- Add continue restart.

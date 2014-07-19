@@ -51,16 +51,16 @@ If any don't, set the current test to failing."
                   ,@args)
               (declare (ignorable ,@args))
               (ensure-dynamic-bindings (current-test failing-tests)
-                (block handler
-                  (handler-bind
-                      ((serious-condition
-                        (lambda (c)
-                          (setq ,errp t)
-                          (when *handle-serious-conditions*
-                            (return-from handler
-                              (format t "~&   each in ~A threw ~A~&"
-                                      current-test
-                                      c))))))
+                (handler-bind ((serious-condition
+                                (lambda (c)
+                                  (setq ,errp t)
+                                  (format t "~&   each in ~A threw ~A~&"
+                                          current-test
+                                          c)
+                                  (if *handle-serious-conditions*
+                                      (continue c)
+                                      (invoke-debugger c)))))
+                  (with-simple-restart (continue "Continue testing.")
                     (unwind-protect
                          ,(if (and (listp (car forms))
                                    (function-name-p (caar forms)))
@@ -98,18 +98,23 @@ If any don't, set the current test to failing."
             (let ((current-test ',name))
               (declare (special current-test))
               (ensure-dynamic-bindings (failing-tests)
-                (handler-bind ((serious-condition
-                                (lambda (c)
-                                  (pushnew current-test failing-tests)
-                                  (when *handle-serious-conditions*
-                                    (return-from ,name
-                                      (format t "~&   ~A's toplevel threw ~A~&"
-                                              current-test
-                                              c))))))
-                  (,',obody ,@body)
-                  (if failing-tests
-                      (cons :failed-tests failing-tests)
-                      :ok)))))))))
+                (block test-body
+                  (handler-bind ((serious-condition
+                                  (lambda (c)
+                                    (pushnew current-test failing-tests)
+                                    (format t "~&   ~A's toplevel threw ~A~&"
+                                            current-test
+                                            c)
+                                    (if *handle-serious-conditions*
+                                        (return-from test-body)
+                                        (restart-case (invoke-debugger c)
+                                          (continue ()
+                                            :report "Continue testing."
+                                            (return-from test-body)))))))
+                    (,',obody ,@body)))
+                (if failing-tests
+                    (cons :failed-tests failing-tests)
+                    :ok))))))))
 
 (def-deftest deftest progn
   "Define a function that will be called during RUN-TESTS.
