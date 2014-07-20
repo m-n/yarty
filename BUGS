@@ -80,7 +80,6 @@ Closed
    compute power (~8% processor of a small digital ocean server).
 -- Only recompute them when a change is detected; also watch the .asd.
 
-
 20 *handle-autorun-compilation-errors* also causes test errors to be
    handled.
 -- *handle-autorun-compilation-errors* is no longer an option, specify
@@ -88,7 +87,6 @@ Closed
 
 19 Error handling should instead be serious condition handling.
 -- change from *handle-errors* to *handle-serious-conditions*
-
 
 21 In autorun, results of test-system are being added to a channel but
    never recieved; growing the channel indefinitely

@@ -51,16 +51,19 @@ If any don't, set the current test to failing."
                   ,@args)
               (declare (ignorable ,@args))
               (ensure-dynamic-bindings (current-test failing-tests)
-                (handler-bind ((serious-condition
-                                (lambda (c)
-                                  (setq ,errp t)
-                                  (format t "~&   each in ~A threw ~A~&"
-                                          current-test
-                                          c)
-                                  (if *handle-serious-conditions*
-                                      (continue c)
-                                      (invoke-debugger c)))))
-                  (with-simple-restart (continue "Continue testing.")
+                (block handler
+                  (handler-bind ((serious-condition
+                                  (lambda (c)
+                                    (setq ,errp t)
+                                    (format t "~&   each in ~A threw ~A~&"
+                                            current-test
+                                            c)
+                                    (if *handle-serious-conditions*
+                                        (return-from handler)
+                                        (restart-case (invoke-debugger c)
+                                          (continue ()
+                                            :report "Continue testing."
+                                            (return-from handler)))))))
                     (unwind-protect
                          ,(if (and (listp (car forms))
                                    (function-name-p (caar forms)))
@@ -98,7 +101,7 @@ If any don't, set the current test to failing."
             (let ((current-test ',name))
               (declare (special current-test))
               (ensure-dynamic-bindings (failing-tests)
-                (block test-body
+                (block handler
                   (handler-bind ((serious-condition
                                   (lambda (c)
                                     (pushnew current-test failing-tests)
@@ -106,11 +109,11 @@ If any don't, set the current test to failing."
                                             current-test
                                             c)
                                     (if *handle-serious-conditions*
-                                        (return-from test-body)
+                                        (return-from handler)
                                         (restart-case (invoke-debugger c)
                                           (continue ()
                                             :report "Continue testing."
-                                            (return-from test-body)))))))
+                                            (return-from handler)))))))
                     (,',obody ,@body)))
                 (if failing-tests
                     (cons :failed-tests failing-tests)
