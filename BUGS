@@ -108,3 +108,6 @@ Closed
 
 23 Stand alone each shouldn't print "In nil"
 -- Fixed.
+
+24 RUN-TESTS should take an arbitrary number of packages.
+-- Fixed.

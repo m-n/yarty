@@ -12,12 +12,19 @@
 (defvar *in-progress-queue* (lparallel.queue:make-queue :fixed-capacity 1))
 (defvar *test-system* ())
 
-(defun run-tests (&optional (package *package*))
-  "Runs all the tests defined by DEFTEST in a given package.
+(defun run-tests (&rest packages)
+  "Runs all the tests defined by DEFTEST in the given packages.
 
 Returns output suitable for use by cl-test-grid."
   (let (failing-tests
-        (package (find-package package)))
+        (packages (if packages
+                      (mapcar (lambda (p)
+                                (let ((pac (find-package p)))
+                                  (if pac
+                                      pac
+                                      (error "Package ~A not found." p))))
+                              packages)
+                      (list *package*))))
     (declare (special failing-tests))
     (flet ((finish ()
              (print (if failing-tests
@@ -25,7 +32,11 @@ Returns output suitable for use by cl-test-grid."
                         :ok)))
            (restart ()
              (return-from run-tests (test-system *test-system*))))
-      (dolist (test (reverse (cdr (assoc package *tests*))) (finish))
+      (dolist (test
+                (alexandria:mappend (lambda (p)
+                                      (reverse (cdr (assoc p *tests*))))
+                                    packages)
+               (finish))
         (let ((restartp (lparallel.queue:peek-queue *restart-queue*)))
           (cond (restartp
                  (lparallel.queue:try-pop-queue *restart-queue*)
