@@ -74,7 +74,8 @@ If any don't, set the current test to failing."
                       (when  (not ,f)
                         (pushnew current-test failing-tests)
                         (cond ((not ,errp)
-                               (format t "~&  In ~A" current-test)
+                               (when current-test
+                                 (format t "~&  In ~A" current-test))
                                (format t "~&  Failing Form ~A"
                                        ',(car forms))
                                ,(when (and args

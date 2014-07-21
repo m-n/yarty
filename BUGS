@@ -105,3 +105,6 @@ Closed
 
 22 Tests should be restartable when conditions aren't handled.
 -- Add continue restart.
+
+23 Stand alone each shouldn't print "In nil"
+-- Fixed.
