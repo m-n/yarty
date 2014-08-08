@@ -3,6 +3,16 @@ Open
 
 17 Files for a test system aren't watched to trigger AUTORUN.
 
+25 autorun doesn't allow rebinding special variables, notably
+   *standard-output*
+
+26 UX failure: After renaming/deleting a test, it's still run and
+   there's no obvious way to remove it.
+
+27 asdf:test-system after clear-tests doesn't necessarily re-add
+   tests; just returns ok after not running anything. Maybe make
+   clear-tests touch the asd file to force recompilation?
+
 Closed
 ------
 
