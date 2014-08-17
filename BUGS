@@ -13,6 +13,12 @@ Open
    tests; just returns ok after not running anything. Maybe make
    clear-tests touch the asd file to force recompilation?
 
+28 autorun starts threads and leaves them running even when autorun is
+   not passed a valid system name.
+
+29 Pie in the sky idea: use emacs compilation machinery to highlight
+   failing tests in a buffer. Probably not worth the effort?
+
 Closed
 ------
 
