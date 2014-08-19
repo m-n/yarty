@@ -19,6 +19,8 @@ Open
 29 Pie in the sky idea: use emacs compilation machinery to highlight
    failing tests in a buffer. Probably not worth the effort?
 
+30 README should include an example .asd
+
 Closed
 ------
 
