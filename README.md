@@ -63,3 +63,41 @@ additionally need to configure slime to globally redirect output.
 Any bug reports, success stories, failure stories, patches, or other
 feedback are welcome at `https://github.com/m-n/yarty` and
 `matt.niemeir@gmail.com`.
+
+Use with ASDF
+=============
+
+Below is the recommended way to setup YARTY tests to run to run when
+`ASDF:TEST-SYSTEM` is called.
+
+    ;;;; example.asd
+
+    (asdf:defsystem #:example
+      :components ((:file "example"))
+      :in-order-to ((test-op (load-op :example-test))))
+
+
+    (asdf:defsystem #:example-test
+      :depends-on (#:example #:yarty)
+      :components ((:file "tests")))
+
+    (defmethod asdf:perform ((o asdf:test-op)
+                             (c (eql (asdf:find-system :example))))
+      (funcall (intern (symbol-name :run-tests)
+                       (find-package :yarty))
+               :example-test))
+
+And the tests file might look something like this:
+
+    ;;;; tests.lisp
+    (defpackage #:example-test
+      (:use :cl :yarty))
+
+    (in-package #:example-test)
+
+    (deftest failing-test
+      (each (= 1 0)
+            (/ 1 0)))
+
+`AUTORUN` calls `ASDF:TEST-SYSTEM` to trigger testing, so if you plan
+to use `AUTORUN` you should create a setup like above.
