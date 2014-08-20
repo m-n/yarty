@@ -90,6 +90,7 @@ Below is the recommended way to setup YARTY tests to run to run when
 And the tests file might look something like this:
 
     ;;;; tests.lisp
+
     (defpackage #:example-test
       (:use :cl :yarty))
 
