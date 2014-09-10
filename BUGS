@@ -132,3 +132,6 @@ Closed
 
 17 Files for a test system aren't watched to trigger AUTORUN.
 -- Fixed, when using asdf setup described in README
+
+31 Bad asdf files chokes autorun
+-- Fixed, add error handling during computation of files to watch

@@ -58,17 +58,22 @@
     (reverse out)))
 
 (defun files-to-watch (system)
-  (flet ((to-watch-one-system (system)
-           (cons (asdf:system-source-file system)
-                 (mapcar #'asdf:component-pathname
-                         (remove-if-not (alexandria:of-type 'asdf:file-component)
-                                        (asdf:required-components system))))))
-    (remove-duplicates
-     (reduce #'append
-             (mapcar #'to-watch-one-system
-                     (cons system (systems-in-order-to-test system))))
-     :test #'equalp
-     :from-end t)))
+  (handler-bind ((error (lambda (c)
+                          (declare (ignore c))
+                          (when *handle-errors*
+                            (return-from files-to-watch
+                              ())))))
+    (flet ((to-watch-one-system (system)
+             (cons (asdf:system-source-file system)
+                   (mapcar #'asdf:component-pathname
+                           (remove-if-not (alexandria:of-type 'asdf:file-component)
+                                          (asdf:required-components system))))))
+      (remove-duplicates
+       (reduce #'append
+               (mapcar #'to-watch-one-system
+                       (cons system (systems-in-order-to-test system))))
+       :test #'equalp
+       :from-end t))))
 
 (defun files-date-sum (files)
   (reduce #'+ (mapcar #'file-write-date files)))
@@ -80,9 +85,9 @@
       (loop
         (let ((new-date-sum (files-date-sum files)))
           (when (not (= new-date-sum date-sum))
-            (lparallel.queue:push-queue :file-changed *control-queue*)
-            (setq date-sum new-date-sum
-                  files (files-to-watch system))))
+            (lparallel.queue:push-queue :file-changed *control-queue*))
+          (setq date-sum new-date-sum
+                files (files-to-watch system)))
         (sleep 0.5)
         (multiple-value-bind (elt foundp)
             (lparallel.queue:peek-queue *control-queue*)
