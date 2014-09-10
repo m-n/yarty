@@ -42,12 +42,33 @@
                       (return-from test-system :failed-tests)))
     (lparallel.queue:try-pop-queue *in-progress-queue*)))
 
+(defun systems-in-order-to-test (system)
+  ;; lists the systems that will be loaded for testing due to
+  ;; the system definition's :in-order-to slot.
+  (unless (typep system 'asdf:system)
+    (setq system (asdf:find-system
+                  (intern (string-upcase system) :keyword))))
+  (let (out)
+    (dolist (in-order-to (asdf/component:component-in-order-to system))
+      (when (string= (car in-order-to) :test-op)
+        (dolist (to-do (cdr in-order-to))
+          (when (string= (car to-do) :load-op)
+            (dolist (systems (cdr to-do))
+              (push systems out))))))
+    (reverse out)))
+
 (defun files-to-watch (system)
-  ;; bug: doesn't list the files in the test-system.
-  (cons (asdf:system-source-file system)
-        (mapcar #'asdf:component-pathname
-                (remove-if-not (alexandria:of-type 'asdf:cl-source-file)
-                               (asdf:required-components system)))))
+  (flet ((to-watch-one-system (system)
+           (cons (asdf:system-source-file system)
+                 (mapcar #'asdf:component-pathname
+                         (remove-if-not (alexandria:of-type 'asdf:file-component)
+                                        (asdf:required-components system))))))
+    (remove-duplicates
+     (reduce #'append
+             (mapcar #'to-watch-one-system
+                     (cons system (systems-in-order-to-test system))))
+     :test #'equalp
+     :from-end t)))
 
 (defun files-date-sum (files)
   (reduce #'+ (mapcar #'file-write-date files)))
@@ -132,7 +153,10 @@ Blocks if the queue is empty."
   "Toggle whether asdf:test-system is automatically run when source is touched.
 
 System should be a string or symbol designating a system name. Autorun
-also binds *handle-serious-conditions* to t."
+also binds *handle-serious-conditions* to t.
+
+Touching files of a test-system will also trigger the tests if the
+asdf setup described in YARTY's readme is used."
   (unless (keywordp system)
     (setq system (intern (string-upcase system) :keyword)))
   (if (gethash system *system-channels*)

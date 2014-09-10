@@ -74,8 +74,9 @@ Below is the recommended way to setup YARTY tests to run to run when
 
     (asdf:defsystem #:example
       :components ((:file "example"))
+      ;; This line alerts AUTORUN to the name of the
+      ;; test system, so that AUTORUN can watch its files.
       :in-order-to ((test-op (load-op :example-test))))
-
 
     (asdf:defsystem #:example-test
       :depends-on (#:example #:yarty)
@@ -102,3 +103,15 @@ And the tests file might look something like this:
 
 `AUTORUN` calls `ASDF:TEST-SYSTEM` to trigger testing, so if you plan
 to use `AUTORUN` you should create a setup like above.
+
+Grouping tests
+==============
+
+Many Common Lisp test libraries offer some way to group multiple tests
+together, sometimes calling the grouping a "suite" or similar.
+
+The YARTY way to group tests is to define each group of tests within
+its own package. You can then run them together by
+`(run-tests 'package1 'package2)`.
+
+Heirarchical grouping of tests is not provided by YARTY.

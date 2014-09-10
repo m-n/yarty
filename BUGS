@@ -1,8 +1,6 @@
 Open
 ----
 
-17 Files for a test system aren't watched to trigger AUTORUN.
-
 25 autorun doesn't allow rebinding special variables, notably
    *standard-output*
 
@@ -130,3 +128,6 @@ Closed
 
 30 README should include an example .asd.
 -- Included.
+
+17 Files for a test system aren't watched to trigger AUTORUN.
+-- Fixed, when using asdf setup described in README
