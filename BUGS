@@ -101,6 +101,7 @@ Closed
 
 19 Error handling should instead be serious condition handling.
 -- change from *handle-errors* to *handle-serious-conditions*
+-- REVERTED: errors are more appropriate. see cltl2 29.3.12
 
 21 In autorun, results of test-system are being added to a channel but
    never recieved; growing the channel indefinitely

@@ -38,7 +38,7 @@ For Running Tests
 
     AUTORUN:            Toggle whether asdf:test-system is automatically run when source is touched.
     RUN-TESTS:          Runs all the tests defined by DEFTEST in the given packages.
-    *HANDLE-SERIOUS-CONDITIONS*:  t: handle in tests; nil: decline to handle. Default is t.
+    *HANDLE-ERRORS*:  t: handle in tests; nil: decline to handle. Default is t.
 
 For Managing Tests
 ------------------

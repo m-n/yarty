@@ -31,13 +31,13 @@
                        (*restart-queue* . ,restart-queue)
                        (*in-progress-queue* . ,in-progress-queue)
                        (*control-queue* . ,control-queue)
-                       (*handle-serious-conditions* . t)
+                       (*handle-errors* . t)
                        (*test-system* . ,system)))))
               (lparallel:make-channel)))))
 
 (defun test-system (&optional (system (intern (package-name *package*) :keyword)))
   (unwind-protect (handler-case (asdf:test-system system)
-                    (serious-condition (c)
+                    (error (c)
                       (format t "Compilation aborted due to error `~A`" c)
                       (return-from test-system :failed-tests)))
     (lparallel.queue:try-pop-queue *in-progress-queue*)))
@@ -153,7 +153,7 @@ Blocks if the queue is empty."
   "Toggle whether asdf:test-system is automatically run when source is touched.
 
 System should be a string or symbol designating a system name. Autorun
-also binds *handle-serious-conditions* to t.
+also binds *handle-errors* to t.
 
 Touching files of a test-system will also trigger the tests if the
 asdf setup described in YARTY's readme is used."

@@ -5,7 +5,7 @@
 (defvar *tests* ()
   "An alist of ((package . (test-function-names*))*)")
 
-(defvar *handle-serious-conditions* t
+(defvar *handle-errors* t
   "t: handle in tests; nil: decline to handle. Default is t.")
 
 (defvar *restart-queue* (lparallel.queue:make-queue :fixed-capacity 1))
@@ -63,13 +63,13 @@ If any don't, set the current test to failing."
               (declare (ignorable ,@args))
               (ensure-dynamic-bindings (current-test failing-tests)
                 (block handler
-                  (handler-bind ((serious-condition
+                  (handler-bind ((error
                                   (lambda (c)
                                     (setq ,errp t)
                                     (format t "~&   each in ~A threw ~A~&"
                                             current-test
                                             c)
-                                    (if *handle-serious-conditions*
+                                    (if *handle-errors*
                                         (return-from handler)
                                         (restart-case (invoke-debugger c)
                                           (continue ()
@@ -114,13 +114,13 @@ If any don't, set the current test to failing."
               (declare (special current-test))
               (ensure-dynamic-bindings (failing-tests)
                 (block handler
-                  (handler-bind ((serious-condition
+                  (handler-bind ((error
                                   (lambda (c)
                                     (pushnew current-test failing-tests)
                                     (format t "~&   ~A's toplevel threw ~A~&"
                                             current-test
                                             c)
-                                    (if *handle-serious-conditions*
+                                    (if *handle-errors*
                                         (return-from handler)
                                         (restart-case (invoke-debugger c)
                                           (continue ()
