@@ -135,3 +135,6 @@ Closed
 
 31 Bad asdf files chokes autorun
 -- Fixed, add error handling during computation of files to watch
+
+32 EACH doesn't recognize flet / labels functions when they start a form
+-- Fixed

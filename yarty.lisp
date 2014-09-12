@@ -80,7 +80,7 @@ If any don't, set the current test to failing."
                                    (function-name-p (caar forms)))
                               `(setq ,@(alexandria:mappend
                                         #'list args (cdar forms))
-                                     ,f (funcall ',(caar forms) ,@args))
+                                     ,f (funcall #',(caar forms) ,@args))
                               `(setq ,f ,(car forms)))
                       (when  (not ,f)
                         (pushnew current-test failing-tests)
