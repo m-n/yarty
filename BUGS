@@ -93,6 +93,7 @@ Closed
 18 Computing files-to-watch every .5 seconds is taking significant
    compute power (~8% processor of a small digital ocean server).
 -- Only recompute them when a change is detected; also watch the .asd.
+-- Same fix again. This time comment the code.
 
 20 *handle-autorun-compilation-errors* also causes test errors to be
    handled.

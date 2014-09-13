@@ -85,9 +85,12 @@
       (loop
         (let ((new-date-sum (files-date-sum files)))
           (when (not (= new-date-sum date-sum))
-            (lparallel.queue:push-queue :file-changed *control-queue*))
-          (setq date-sum new-date-sum
-                files (files-to-watch system)))
+            (setq date-sum new-date-sum
+                  ;; We recompute the files to watch here because
+                  ;; computing them every time through the loop caused
+                  ;; too much cpu usage while idle.
+                  files (files-to-watch system))
+            (lparallel.queue:push-queue :file-changed *control-queue*)))
         (sleep 0.5)
         (multiple-value-bind (elt foundp)
             (lparallel.queue:peek-queue *control-queue*)
