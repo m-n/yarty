@@ -16,6 +16,11 @@ Open
 
 29 Pie in the sky idea: use emacs compilation machinery to highlight
    failing tests in a buffer. Probably not worth the effort?
+-- See slime-create-compilation-log and things manipulating the result
+-- of make-overlay for example of how slime works.
+
+33 Feature request: start a child image (of any impl.) to return test
+   results and exit.
 
 Closed
 ------
