@@ -36,3 +36,8 @@
        (symbolp form)
        (not (special-operator-p form))
        (not (macro-function form))))
+
+(defun quit (exit-code)
+  #+sbcl (sb-ext:quit :unix-status exit-code)
+  #+ccl (ccl:quit exit-code)
+  #-(or ccl sbcl) (warn "YARTY::QUIT not yet ported to this implementation."))

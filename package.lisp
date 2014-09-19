@@ -11,4 +11,6 @@
    #:autorun
    #:clear-tests
    #:*handle-errors*
+   #:test-system
+   #:fresh-test
    ))

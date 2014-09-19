@@ -36,14 +36,18 @@ For Writing Tests
 For Running Tests
 -----------------
 
-    AUTORUN:            Toggle whether asdf:test-system is automatically run when source is touched.
     RUN-TESTS:          Runs all the tests defined by DEFTEST in the given packages.
-    *HANDLE-ERRORS*:  t: handle in tests; nil: decline to handle. Default is t.
+    AUTORUN:            Toggle whether asdf:test-system is automatically run when source is touched.
+    FRESH-TEST:        Test on a fresh CCL or SBCL image. Assumes the userinit loads quicklisp.
+    TEST-SYSTEM:        Test the system. Either return the last value of RUN-TESTS or quit the image.
 
 For Managing Tests
 ------------------
 
     CLEAR-TESTS:        Clear the tests for the given package, default to *package*.
+    *HANDLE-ERRORS*:    t: handle in tests; nil: decline to handle. Default is t.
+
+Full docstrings and argument lists are available in the file `docstrings`.
 
 Installation
 ============

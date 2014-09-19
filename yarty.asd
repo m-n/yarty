@@ -6,9 +6,17 @@
   :author "Matt Niemeir <matt.niemeir@gmail.com>"
   :license "BSD 2-clause"
   :depends-on (#:alexandria
-               #:bordeaux-threads
-               #:lparallel)
+
+               ;; Concurrency used for running tests on filesystem change
+               #:lparallel
+
+               ;; RPC used for running tests in fresh images
+               #:lfarm-client
+               #:lfarm-admin
+               )
   :components ((:file "package")
                (:file "utils")
                (:file "yarty")
-               (:file "autorun")))
+               (:file "autorun")
+               (:file "fresh")
+               ))

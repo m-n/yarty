@@ -19,8 +19,9 @@ Open
 -- See slime-create-compilation-log and things manipulating the result
 -- of make-overlay for example of how slime works.
 
-33 Feature request: start a child image (of any impl.) to return test
-   results and exit.
+35 Considering commenting all non-result printing.
+
+36 Considering exporting a stream to which test output is printed.
 
 Closed
 ------
@@ -144,3 +145,10 @@ Closed
 
 32 EACH doesn't recognize flet / labels functions when they start a form
 -- Fixed
+
+33 Feature request: start a child image (of any impl.) to return test
+   results and exit.
+-- Added for sbcl and ccl as FRESH-TEST
+
+34 Our return value doesn't actually match CL-TEST-GRID
+-- Changed to mach CL-TEST-GRID: failures are now their own list (and strings)

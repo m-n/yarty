@@ -1,0 +1,61 @@
+
+YARTY > ASDF System
+ Yare and Astounding Regression Tester: YARTY
+
+*handle-errors* > variable
+ t: handle in tests; nil: decline to handle. Default is t.
+
+(AUTORUN &key system) > function
+ Toggle whether asdf:test-system is automatically run when source is touched.
+
+System should be a string or symbol designating a system name. Autorun
+also binds *handle-errors* to t.
+
+Touching files of a test-system will also trigger the tests if the
+asdf setup described in YARTY's readme is used.
+
+(CLEAR-TESTS &optional package) > function
+ Clear the tests for the given package, default to *package*.
+
+If nil is given as an explicit argument, clear all tests for all
+packages.
+
+(DEFTEST name &body body) > macro
+ Define a function that will be called during RUN-TESTS.
+
+Insert forms which should return truthy inside an EACH.
+
+(DEFTEST/EACH name &body body) > macro
+ Like DEFTEST but wraps its body in an EACH.
+
+(EACH &body forms) > macro
+ Test that each form returns truthy.
+
+If any don't, set the current test to failing.
+
+(FRESH-TEST system &key host port lisp) > function
+ Test on a fresh CCL or SBCL image. Assumes the userinit loads quicklisp.
+
+(RUN-TESTS &rest packages) > function
+ Runs all the tests defined by DEFTEST in the given packages.
+
+Returns output suitable for use by cl-test-grid.
+
+(SIGNALS-A condition &body body) > macro
+ Returns true if body signals the condition.
+
+(TEST-SYSTEM system &key quit) > function
+ Test the system. Either return the last value of RUN-TESTS or quit the image.
+
+Internally calls ASDF:TEST-SYSTEM. If quit is nil, then this records
+the result of any calls to RUN-TESTS made during ASDF:TEST-SYSTEM and
+returns the last one.
+
+If QUIT is true then it exits the image after testing. In this case
+the exit code of the process indicates the status of the tests.
+
+        Exit Code    Status
+        0            Tests Succeeded
+        1            Tests Failed
+        125          Could Not Test
+

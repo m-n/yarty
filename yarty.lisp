@@ -12,6 +12,41 @@
 (defvar *in-progress-queue* (lparallel.queue:make-queue :fixed-capacity 1))
 (defvar *test-system* ())
 
+(define-condition test-results ()
+  ((results :initarg :results :reader results))
+  (:documentation
+   "RUN-TESTS signals this with its result before returning."))
+
+(defun test-system (system &key quit)
+  "Test the system. Either return the last value of RUN-TESTS or quit the image.
+
+Internally calls ASDF:TEST-SYSTEM. If quit is nil, then this records
+the result of any calls to RUN-TESTS made during ASDF:TEST-SYSTEM and
+returns the last one.
+
+If QUIT is true then it exits the image after testing. In this case
+the exit code of the process indicates the status of the tests.
+
+        Exit Code    Status
+        0            Tests Succeeded
+        1            Tests Failed
+        125          Could Not Test"
+  (let (res)
+    (handler-bind ((test-results
+                    (lambda  (c)
+                      (setq res (results c))))
+                   (error
+                    (lambda (c)
+                      (when quit
+                        (format t "Testing aborted due to error \"~A.\"" c)
+                        (quit 125)))))
+      (funcall (find-symbol (string :test-system) :asdf) system)
+      (if quit
+          (case res
+            (:ok (quit 0))
+            (otherwise (quit 1)))
+          res))))
+
 (defun run-tests (&rest packages)
   "Runs all the tests defined by DEFTEST in the given packages.
 
@@ -27,16 +62,21 @@ Returns output suitable for use by cl-test-grid."
                       (list *package*))))
     (declare (special failing-tests))
     (flet ((finish ()
-             (print (if failing-tests
-                        (cons :failed-tests failing-tests)
-                        :ok)))
+             (let ((res (if failing-tests
+                            (list :failed-tests (mapcar #'string-downcase
+                                                        failing-tests))
+                            :ok)))
+               (print res)
+               (signal (make-condition 'test-results :results res))
+               res))
            (restart ()
-             (return-from run-tests (test-system *test-system*))))
+             (declare (ftype function autorun-test-system))
+             (return-from run-tests (autorun-test-system *test-system*))))
       (dolist (test
-                (alexandria:mappend (lambda (p)
-                                      (reverse (cdr (assoc p *tests*))))
-                                    packages)
-               (finish))
+                  (alexandria:mappend (lambda (p)
+                                        (reverse (cdr (assoc p *tests*))))
+                                      packages)
+                (finish))
         (let ((restartp (lparallel.queue:peek-queue *restart-queue*)))
           (cond (restartp
                  (lparallel.queue:try-pop-queue *restart-queue*)

@@ -35,11 +35,11 @@
                        (*test-system* . ,system)))))
               (lparallel:make-channel)))))
 
-(defun test-system (&optional (system (intern (package-name *package*) :keyword)))
+(defun autorun-test-system (&optional (system (intern (package-name *package*) :keyword)))
   (unwind-protect (handler-case (asdf:test-system system)
                     (error (c)
                       (format t "Compilation aborted due to error `~A`" c)
-                      (return-from test-system :failed-tests)))
+                      (return-from autorun-test-system :failed-tests)))
     (lparallel.queue:try-pop-queue *in-progress-queue*)))
 
 (defun systems-in-order-to-test (system)
@@ -136,7 +136,7 @@ Blocks if the queue is empty."
                       (lparallel.queue:push-queue/no-lock t *restart-queue*))))
                  (t
                   (lparallel.queue:push-queue/no-lock t *in-progress-queue*)
-                  (lparallel:submit-task channel #'test-system system)))))))))
+                  (lparallel:submit-task channel #'autorun-test-system system)))))))))
 
 (defun start-autorun (system)
   (let ((chan (ensure-system-channel system)))
