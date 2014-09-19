@@ -21,8 +21,6 @@ Open
 
 35 Considering commenting all non-result printing.
 
-36 Considering exporting a stream to which test output is printed.
-
 Closed
 ------
 
@@ -152,3 +150,6 @@ Closed
 
 34 Our return value doesn't actually match CL-TEST-GRID
 -- Changed to mach CL-TEST-GRID: failures are now their own list (and strings)
+
+36 Considering exporting a stream to which test output is printed.
+-- Add *OUTPUT*

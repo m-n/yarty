@@ -8,6 +8,11 @@
 (defvar *handle-errors* t
   "t: handle in tests; nil: decline to handle. Default is t.")
 
+(defvar *output* (make-synonym-stream '*standard-output*)
+  "The stream testing info is print to.
+
+This defaults to a *standard-output* synonym-stream.")
+
 (defvar *restart-queue* (lparallel.queue:make-queue :fixed-capacity 1))
 (defvar *in-progress-queue* (lparallel.queue:make-queue :fixed-capacity 1))
 (defvar *test-system* ())
@@ -38,7 +43,7 @@ the exit code of the process indicates the status of the tests.
                    (error
                     (lambda (c)
                       (when quit
-                        (format t "Testing aborted due to error \"~A.\"" c)
+                        (format *output* "Testing aborted due to error \"~A.\"" c)
                         (quit 125)))))
       (funcall (find-symbol (string :test-system) :asdf) system)
       (if quit
@@ -66,7 +71,7 @@ Returns output suitable for use by cl-test-grid."
                             (list :failed-tests (mapcar #'string-downcase
                                                         failing-tests))
                             :ok)))
-               (print res)
+               (print res *output*)
                (signal (make-condition 'test-results :results res))
                res))
            (restart ()
@@ -106,7 +111,7 @@ If any don't, set the current test to failing."
                   (handler-bind ((error
                                   (lambda (c)
                                     (setq ,errp t)
-                                    (format t "~&   each in ~A threw ~A~&"
+                                    (format *output* "~&   each in ~A threw ~A~&"
                                             current-test
                                             c)
                                     (if *handle-errors*
@@ -126,8 +131,8 @@ If any don't, set the current test to failing."
                         (pushnew current-test failing-tests)
                         (cond ((not ,errp)
                                (when current-test
-                                 (format t "~&  In ~A" current-test))
-                               (format t "~&  Failing Form ~A"
+                                 (format *output* "~&  In ~A" current-test))
+                               (format *output* "~&  Failing Form ~A"
                                        ',(car forms))
                                ,(when (and args
                                            (listp (car forms))
@@ -138,7 +143,7 @@ If any don't, set the current test to failing."
                                         ',(caar forms)
                                         (list ,@args))))
                               (t
-                               (format t "~&  Erroring Form ~A"
+                               (format *output* "~&  Erroring Form ~A"
                                        ',(car forms)))))))))
               (each ,@(cdr forms)))))))
 
@@ -157,7 +162,7 @@ If any don't, set the current test to failing."
                   (handler-bind ((error
                                   (lambda (c)
                                     (pushnew current-test failing-tests)
-                                    (format t "~&   ~A's toplevel threw ~A~&"
+                                    (format *output* "~&   ~A's toplevel threw ~A~&"
                                             current-test
                                             c)
                                     (if *handle-errors*

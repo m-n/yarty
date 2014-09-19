@@ -46,6 +46,7 @@ For Managing Tests
 
     CLEAR-TESTS:        Clear the tests for the given package, default to *package*.
     *HANDLE-ERRORS*:    t: handle in tests; nil: decline to handle. Default is t.
+    *OUTPUT*:           The stream testing info is print to.
 
 Full docstrings and argument lists are available in the file `docstrings`.
 

@@ -3,14 +3,20 @@
 (defpackage #:yarty
   (:use #:cl)
   (:export
-   #:deftest/each
+   ;; For Writing Tests
    #:deftest
-   #:run-tests
    #:each
+   #:deftest/each
    #:signals-a
+
+   ;; For Running Tests
+   #:run-tests
    #:autorun
+   #:fresh-test
+   #:test-system
+
+   ;; For Managing Tests
    #:clear-tests
    #:*handle-errors*
-   #:test-system
-   #:fresh-test
+   #:*output*
    ))

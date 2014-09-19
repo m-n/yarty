@@ -5,6 +5,11 @@ YARTY > ASDF System
 *handle-errors* > variable
  t: handle in tests; nil: decline to handle. Default is t.
 
+*output* > variable
+ The stream testing info is print to.
+
+This defaults to a *standard-output* synonym-stream.
+
 (AUTORUN &key system) > function
  Toggle whether asdf:test-system is automatically run when source is touched.
 
