@@ -148,33 +148,38 @@ If any don't, set the current test to failing."
               (each ,@(cdr forms)))))))
 
 (defmacro def-deftest (name obody documentation)
-  (alexandria:with-gensyms (cons)
+  (alexandria:with-gensyms (cons forms decl doc)
     `(defmacro ,name (name &body body)
        ,documentation
-       `(let ((,',cons (or (assoc *package* *tests*)
-                           (car (push (cons *package* ()) *tests*)))))
-          (pushnew ',name (cdr ,',cons))
-          (defun ,name ()
-            (let ((current-test ',name))
-              (declare (special current-test))
-              (ensure-dynamic-bindings (failing-tests)
-                (block handler
-                  (handler-bind ((error
-                                  (lambda (c)
-                                    (pushnew current-test failing-tests)
-                                    (format *output* "~&   ~A's toplevel threw ~A~&"
-                                            current-test
-                                            c)
-                                    (if *handle-errors*
-                                        (return-from handler)
-                                        (restart-case (invoke-debugger c)
-                                          (continue ()
-                                            :report "Continue testing."
-                                            (return-from handler)))))))
-                    (,',obody ,@body)))
-                (if failing-tests
-                    (cons :failed-tests failing-tests)
-                    :ok))))))))
+       (multiple-value-bind (,forms ,decl ,doc)
+           (alexandria:parse-body body :documentation t)
+         `(let ((,',cons (or (assoc *package* *tests*)
+                             (car (push (cons *package* ()) *tests*)))))
+            (pushnew ',name (cdr ,',cons))
+            (export ',name)
+            (defun ,name ()
+              ,@,decl
+              ,,doc
+              (let ((current-test ',name))
+                (declare (special current-test))
+                (ensure-dynamic-bindings (failing-tests)
+                  (block handler
+                    (handler-bind ((error
+                                    (lambda (c)
+                                      (pushnew current-test failing-tests)
+                                      (format *output* "~&   ~A's toplevel threw ~A~&"
+                                              current-test
+                                              c)
+                                      (if *handle-errors*
+                                          (return-from handler)
+                                          (restart-case (invoke-debugger c)
+                                            (continue ()
+                                              :report "Continue testing."
+                                              (return-from handler)))))))
+                      (,',obody ,@,forms)))
+                  (if failing-tests
+                      (cons :failed-tests failing-tests)
+                      :ok)))))))))
 
 (def-deftest deftest progn
   "Define a function that will be called during RUN-TESTS.

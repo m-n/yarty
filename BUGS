@@ -153,3 +153,9 @@ Closed
 
 36 Considering exporting a stream to which test output is printed.
 -- Add *OUTPUT*
+
+36 Enhancement: Export test functions
+-- Added
+
+37 Allow docstrings in deftest
+-- Added, as well as declarations
