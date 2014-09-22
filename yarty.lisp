@@ -87,7 +87,10 @@ Returns output suitable for use by cl-test-grid."
                  (lparallel.queue:try-pop-queue *restart-queue*)
                  (restart))
                 (t
-                 (funcall test))))))))
+                 (let ((start (get-internal-run-time)))
+                   (funcall test)
+                   (setf (get test :duration) (- (get-internal-run-time)
+                                                 start))))))))))
 
 (defmacro each (&body forms)
   "Test that each form returns truthy.

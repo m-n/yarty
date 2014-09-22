@@ -19,4 +19,5 @@
    #:clear-tests
    #:*handle-errors*
    #:*output*
+   #:graph-durations
    ))

@@ -13,10 +13,14 @@
                ;; RPC used for running tests in fresh images
                #:lfarm-client
                #:lfarm-admin
+
+               ;; Graphing library for timing results
+               #:cl-spark
                )
   :components ((:file "package")
                (:file "utils")
                (:file "yarty")
                (:file "autorun")
                (:file "fresh")
+               (:file "graph")
                ))
