@@ -114,7 +114,8 @@ If any don't, set the current test to failing."
                   (handler-bind ((error
                                   (lambda (c)
                                     (setq ,errp t)
-                                    (format *output* "~&   each in ~A threw ~A~&"
+                                    (format *output*
+                                            "~&  each in ~A threw \"~A\"~&"
                                             current-test
                                             c)
                                     (if *handle-errors*
@@ -146,7 +147,7 @@ If any don't, set the current test to failing."
                                         ',(caar forms)
                                         (list ,@args))))
                               (t
-                               (format *output* "~&  Erroring Form ~A"
+                               (format *output* "~&    Erroring Form ~A"
                                        ',(car forms)))))))))
               (each ,@(cdr forms)))))))
 
@@ -170,7 +171,8 @@ If any don't, set the current test to failing."
                     (handler-bind ((error
                                     (lambda (c)
                                       (pushnew current-test failing-tests)
-                                      (format *output* "~&   ~A's toplevel threw ~A~&"
+                                      (format *output*
+                                              "~&  ~A's toplevel threw \"~A\"~&"
                                               current-test
                                               c)
                                       (if *handle-errors*
