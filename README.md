@@ -5,9 +5,6 @@ Yare and Astounding Regression Tester: YARTY
 
 For SBCL and CCL.
 
-Status: The library has only been used lightly, but seems to preform
-reasonably.
-
 YARTY is similar to other CL regression test libraries. The main
 design points particular to YARTY are as follows. First, the returned
 value from `RUN-TESTS` is immediately compatible with
@@ -17,38 +14,10 @@ predicates, e.g. `EQUAL`, the YARTY way is to include the `EQUAL` call
 within an `EACH`. Third, automatic triggering of the test suite on
 filesystem changes is included via `AUTORUN`.
 
-`AUTORUN` is still experimental, but it is a primary goal of YARTY to
-make it practical. When active, it internally calls `ASDF:TEST-SYSTEM`
-when any of that system's source files are touched. ASDF thus takes
-care of triggering any necessary recompilation.
-
-Glossary
-========
-
-For Writing Tests
------------------
-
-    DEFTEST:            Define a function that will be called during RUN-TESTS.
-    EACH:               Test that each form returns truthy.
-    DEFTEST/EACH:       Like DEFTEST but wraps its body in an EACH.
-    SIGNALS-A:          Returns true if body signals the condition.
-
-For Running Tests
------------------
-
-    RUN-TESTS:          Runs all the tests defined by DEFTEST in the given packages.
-    AUTORUN:            Toggle whether asdf:test-system is automatically run when source is touched.
-    FRESH-TEST:        Test on a fresh CCL or SBCL image. Assumes the userinit loads quicklisp.
-    TEST-SYSTEM:        Test the system. Either return the last value of RUN-TESTS or quit the image.
-
-For Managing Tests
-------------------
-
-    CLEAR-TESTS:        Clear the tests for the given package, default to *package*.
-    *HANDLE-ERRORS*:    t: handle in tests; nil: decline to handle. Default is t.
-    *OUTPUT*:           The stream testing info is print to.
-
-Full docstrings and argument lists are available in the file `docstrings`.
+It is a primary goal of YARTY to make `AUTORUN` practical. When
+active, it internally calls `ASDF:TEST-SYSTEM` when any of the watched
+system's source files are touched. ASDF thus takes care of triggering
+any necessary recompilation.
 
 Installation
 ============
@@ -63,17 +32,16 @@ Then, in lisp:
     (ql:quickload 'yarty)
 
 In order to see the output of `AUTORUN` at the slime repl, you may
-additionally need to configure slime to globally redirect output.
+additionally need to configure slime to globally redirect output:
 
-Any bug reports, success stories, failure stories, patches, or other
-feedback are welcome at `https://github.com/m-n/yarty` and
-`matt.niemeir@gmail.com`.
+    ;;;; in file ~/.swank.lisp
+    (cl:setq swank:*globally-redirect-io* cl:t)
 
-Use with ASDF
-=============
+Setup and Organization
+======================
 
-Below is the recommended way to setup YARTY tests to run to run when
-`ASDF:TEST-SYSTEM` is called.
+YARTY expects the tests to typically be run under ASDF. This is the
+recommended way to set that up:
 
     ;;;; example.asd
 
@@ -103,11 +71,56 @@ And the tests file might look something like this:
     (in-package #:example-test)
 
     (deftest failing-test
-      (each (= 1 0)
-            (/ 1 0)))
+      (let ((x 1)
+            (y 0))
+        (each (= x y)
+              (/ x y))))
 
-`AUTORUN` calls `ASDF:TEST-SYSTEM` to trigger testing, so if you plan
-to use `AUTORUN` you should create a setup like above.
+Then calling `(asdf:test-system :example)` should create output
+similar to:
+
+      In FAILING-TEST
+      Failing Form (= X Y)
+                   (= 1 0)
+      each in FAILING-TEST threw "DIVISION-BY-ZERO detected
+    performing / on (1 0)"
+        Erroring Form (/ X Y)
+    (:FAILED-TESTS ("failing-test"))
+
+YARTY relies on this setup:
+
+* YARTY relies on `ASDF:TEST-SYSTEM`'s recompilation to keep tests up
+  to date with changed sources.
+* `AUTORUN` calls `ASDF:TEST-SYSTEM` to trigger testing.
+* `YARTY:TEST-SYSTEM` is a wrapper around `ASDF:TEST-SYSTEM`.
+
+Glossary
+========
+
+For Writing Tests
+-----------------
+
+    DEFTEST:            Define a function that will be called during RUN-TESTS.
+    EACH:               Test that each form returns truthy.
+    DEFTEST/EACH:       Like DEFTEST but wraps its body in an EACH.
+    SIGNALS-A:          Returns true if body signals the condition.
+
+For Running Tests
+-----------------
+
+    RUN-TESTS:          Runs all the tests defined by DEFTEST in the given packages.
+    AUTORUN:            Toggle whether asdf:test-system is automatically run when source is touched.
+    FRESH-TEST:        Test on a fresh CCL or SBCL image. Assumes the userinit loads quicklisp.
+    TEST-SYSTEM:        Test the system. Either return the last value of RUN-TESTS or quit the image.
+
+For Managing Tests
+------------------
+
+    CLEAR-TESTS:        Clear the tests for the given package, default to *package*.
+    *HANDLE-ERRORS*:    t: handle in tests; nil: decline to handle. Default is t.
+    *OUTPUT*:           The stream testing info is print to.
+
+Full docstrings and argument lists are available in the file `docstrings`.
 
 Grouping tests
 ==============
@@ -120,3 +133,10 @@ its own package. You can then run them together by
 `(run-tests 'package1 'package2)`.
 
 Heirarchical grouping of tests is not provided by YARTY.
+
+Footer
+======
+
+Any bug reports, success stories, failure stories, patches, or other
+feedback are welcome at `https://github.com/m-n/yarty` and
+`matt.niemeir@gmail.com`.
