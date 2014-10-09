@@ -70,7 +70,7 @@ And the tests file might look something like this:
 
     (in-package #:example-test)
 
-    (deftest failing-test
+    (deftest arithmetic
       (let ((x 1)
             (y 0))
         (each (= x y)
@@ -79,13 +79,13 @@ And the tests file might look something like this:
 Then calling `(asdf:test-system :example)` should create output
 similar to:
 
-      In FAILING-TEST
+      In ARITHMETIC
       Failing Form (= X Y)
                    (= 1 0)
-      each in FAILING-TEST threw "DIVISION-BY-ZERO detected
+      each in ARITHMETIC threw "DIVISION-BY-ZERO detected
     performing / on (1 0)"
         Erroring Form (/ X Y)
-    (:FAILED-TESTS ("failing-test"))
+    (:FAILED-TESTS ("arithmetic"))
 
 YARTY relies on this setup:
 
