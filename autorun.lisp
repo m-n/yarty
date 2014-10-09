@@ -167,6 +167,12 @@ Touching files of a test-system will also trigger the tests if the
 asdf setup described in YARTY's readme is used."
   (unless (keywordp system)
     (setq system (intern (string-upcase system) :keyword)))
-  (if (gethash system *system-channels*)
-      (shutdown-autorun system)
-      (start-autorun system)))
+  (cond ((gethash system *system-channels*)
+         (format t "Terminating autorun for system ~(~A~)." system)
+         (shutdown-autorun system))
+        ((asdf:find-system system ())
+         (format t "Starting autorun for system ~(~A~)." system)
+         (start-autorun system))
+        (t
+         (format t "Failure to start autorun: system \"~(~A~)\" not found."
+                 system))))
