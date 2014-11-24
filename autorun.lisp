@@ -40,7 +40,9 @@
                     (error (c)
                       (format t "Compilation aborted due to error `~A`" c)
                       (return-from autorun-test-system :failed-tests)))
-    (lparallel.queue:try-pop-queue *in-progress-queue*)))
+    (if (lparallel.queue:try-pop-queue *restart-queue*)
+        (autorun-test-system system)
+        (lparallel.queue:try-pop-queue *in-progress-queue*))))
 
 (defun systems-in-order-to-test (system)
   ;; lists the systems that will be loaded for testing due to
