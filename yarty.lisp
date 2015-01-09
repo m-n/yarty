@@ -22,40 +22,13 @@ This defaults to a *standard-output* synonym-stream.")
   (:documentation
    "RUN-TESTS signals this with its result before returning."))
 
-(defun test-system (system &key quit)
-  "Test the system. Either return the last value of RUN-TESTS or quit the image.
-
-Internally calls ASDF:TEST-SYSTEM. If quit is nil, then this records
-the result of any calls to RUN-TESTS made during ASDF:TEST-SYSTEM and
-returns the last one.
-
-If QUIT is true then it exits the image after testing. In this case
-the exit code of the process indicates the status of the tests.
-
-        Exit Code    Status
-        0            Tests Succeeded
-        1            Tests Failed
-        125          Could Not Test"
-  (let (res)
-    (handler-bind ((test-results
-                    (lambda  (c)
-                      (setq res (results c))))
-                   (error
-                    (lambda (c)
-                      (when quit
-                        (format *output* "Testing aborted due to error \"~A.\"" c)
-                        (quit 125)))))
-      (funcall (find-symbol (string :test-system) :asdf) system)
-      (if quit
-          (case res
-            (:ok (quit 0))
-            (otherwise (quit 1)))
-          res))))
-
 (defun run-tests (&rest packages)
   "Runs all the tests defined by DEFTEST in the given packages.
 
-Returns output suitable for use by cl-test-grid."
+Returns output suitable for use by cl-test-grid: either the
+keyword :ok, or a list whose first element is the
+keyword :failed-tests and whose second element is a list of the
+names (as strings) of those tests."
   (let (failing-tests
         (packages (if packages
                       (mapcar (lambda (p)
@@ -91,6 +64,49 @@ Returns output suitable for use by cl-test-grid."
                    (funcall test)
                    (setf (get test :duration) (- (get-internal-run-time)
                                                  start))))))))))
+
+(defun combine-results (r1 r2)
+  "Combine two cl-test-grid style test results as if they belong to
+the same system."
+  (cond ((not r1)
+         r2)
+        ((not r2)
+         r1)
+        ((eq r1 :ok)
+         r2)
+        ((eq r2 :ok)
+         r1)
+        (t (list :failed-tests (append (second r1) (second r2))))))
+
+(defun test-system (system &key quit)
+  "Test the system. Either return the value of RUN-TESTS or quit the image.
+
+Internally calls ASDF:TEST-SYSTEM. If quit is nil, then this returns
+the combination of the results of any calls to RUN-TESTS made during
+ASDF:TEST-SYSTEM.
+
+If QUIT is true then it exits the image after testing. In this case
+the exit code of the process indicates the status of the tests.
+
+        Exit Code    Status
+        0            Tests Succeeded
+        1            Tests Failed
+        125          Could Not Test"
+  (let (res)
+    (handler-bind ((test-results
+                    (lambda  (c)
+                      (setq res (combine-results res (results c)))))
+                   (error
+                    (lambda (c)
+                      (when quit
+                        (format *output* "Testing aborted due to error \"~A.\"" c)
+                        (quit 125)))))
+      (funcall (find-symbol (string :test-system) :asdf) system)
+      (if quit
+          (case res
+            (:ok (quit 0))
+            (otherwise (quit 1)))
+          res))))
 
 (defmacro each (&body forms)
   "Test that each form returns truthy.

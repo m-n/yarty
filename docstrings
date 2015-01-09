@@ -49,17 +49,20 @@ Experimental feature.
 (RUN-TESTS &rest packages) > function
  Runs all the tests defined by DEFTEST in the given packages.
 
-Returns output suitable for use by cl-test-grid.
+Returns output suitable for use by cl-test-grid: either the
+keyword :ok, or a list whose first element is the
+keyword :failed-tests and whose second element is a list of the
+names (as strings) of those tests.
 
 (SIGNALS-A condition &body body) > macro
  Returns true if body signals the condition.
 
 (TEST-SYSTEM system &key quit) > function
- Test the system. Either return the last value of RUN-TESTS or quit the image.
+ Test the system. Either return the value of RUN-TESTS or quit the image.
 
-Internally calls ASDF:TEST-SYSTEM. If quit is nil, then this records
-the result of any calls to RUN-TESTS made during ASDF:TEST-SYSTEM and
-returns the last one.
+Internally calls ASDF:TEST-SYSTEM. If quit is nil, then this returns
+the combination of the results of any calls to RUN-TESTS made during
+ASDF:TEST-SYSTEM.
 
 If QUIT is true then it exits the image after testing. In this case
 the exit code of the process indicates the status of the tests.
@@ -68,3 +71,4 @@ the exit code of the process indicates the status of the tests.
         0            Tests Succeeded
         1            Tests Failed
         125          Could Not Test
+
