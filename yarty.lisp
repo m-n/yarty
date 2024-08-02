@@ -32,10 +32,8 @@ names (as strings) of those tests."
   (let (failing-tests
         (packages (if packages
                       (mapcar (lambda (p)
-                                (let ((pac (find-package p)))
-                                  (if pac
-                                      pac
-                                      (error "Package ~A not found." p))))
+                                (or (find-package p)
+                                    (error "Package ~A not found." p)))
                               packages)
                       (list *package*))))
     (declare (special failing-tests))
