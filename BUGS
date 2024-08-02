@@ -18,6 +18,11 @@ Open
 
 35 Considering commenting all non-result printing.
 
+38 Updating the test file does not trigger autorun.
+
+39 nil *handle-errors* should probably just decline to handle instead of
+   explicitly triggering the debugger.
+
 Closed
 ------
 
